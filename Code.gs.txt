@@ -18,7 +18,7 @@ var BANG_ = {
 var CD_MAC_DINH_ = {
   ten: "Tiệm Vàng Thái Dương", khau: "Vàng thật – Giá thật – Uy tín 3 đời",
   dc: "Số 1 đường Trần Phú, TP Bắc Ninh", sdt: "0912345678", zalo: "0912345678",
-  gio: "7:30 – 20:30 tất cả các ngày", ban_do: "", chu_chay: "Thu mua vàng cũ giá cao\nĐổi vàng không mất công\nBảo hành trọn đời – đánh bóng miễn phí\nMiễn phí khắc tên nhẫn cưới", chay_gia: "1", chay_km: "1",
+  gio: "7:30 – 20:30 tất cả các ngày", ban_do: "", chu_chay: "Thu mua vàng cũ giá cao\nĐổi vàng không mất công\nBảo hành trọn đời – đánh bóng miễn phí\nMiễn phí khắc tên nhẫn cưới", chay_gia: "1", chay_km: "1", banner_ds: "[]", bn_km: "1", bn_gia: "1",
   web: "", giu_ngay: "3", banner: "Tinh hoa vàng Việt", banner_phu: "Trang sức vàng 18K, 24K chế tác tinh xảo – kiểm định tuổi vàng, bảo hành trọn đời"
 };
 var GIA_MAU_ = [
@@ -86,7 +86,7 @@ function bam_(s) {
 function iso_(d) { return d instanceof Date ? d.toISOString() : (d ? String(d) : ""); }
 function so_(x) { var n = +String(x).replace(/[^\d.\-]/g, ""); return isFinite(n) ? n : 0; }
 function chu_(x, max) { return String(x == null ? "" : x).replace(/[<>]/g, "").trim().slice(0, max || 200); }
-function xoaCache_() { var c = CacheService.getScriptCache(); c.remove("xem3_n"); }
+function xoaCache_() { var c = CacheService.getScriptCache(); c.remove("xem4_n"); }
 function khoa_(f) {
   var l = LockService.getScriptLock(); l.waitLock(20000);
   try { return f(); } finally { xoaCache_(); l.releaseLock(); }
@@ -130,7 +130,7 @@ function json_(o) { return ContentService.createTextOutput(JSON.stringify(o)).se
 function boc_(f) { try { return { ok: true, kq: f() }; } catch (err) { return { ok: false, loi: String((err && err.message) || err) }; } }
 
 // ---------------- API POST ----------------
-var API_DS_ = ["xem", "giuMau", "trangThaiPin", "taoChu", "dangNhap", "quanLy", "luuGia", "luuGiaNgay", "luuKM", "xoaKM", "banSP", "nhapLaiSP", "ganNhan", "luuSP", "xoaSP", "taiAnh", "xoaAnh", "doiGiu", "xoaGiu", "luuCaiDat", "doiPin", "sapXepSP"];
+var API_DS_ = ["xem", "giuMau", "trangThaiPin", "taoChu", "dangNhap", "quanLy", "luuGia", "luuGiaNgay", "luuKM", "xoaKM", "banSP", "nhapLaiSP", "ganNhan", "capNhatNhieu", "luuBanner", "luuSP", "xoaSP", "taiAnh", "xoaAnh", "doiGiu", "xoaGiu", "luuCaiDat", "doiPin", "sapXepSP"];
 function doPost(e) {
   return json_(boc_(function () {
     var b = JSON.parse((e && e.postData && e.postData.contents) || "{}"), ten = String(b.fn || "");
@@ -165,19 +165,19 @@ function khuyenMai_() {
       tu: ngayO_(r[7]), den: ngayO_(r[8]), bat: String(r[9]) !== "không" };
   });
 }
-function cdCong_(c) { var o = {}; ["ten", "khau", "dc", "sdt", "zalo", "gio", "ban_do", "chu_chay", "web", "giu_ngay", "banner", "banner_phu", "chay_gia", "chay_km"].forEach(function (k) { o[k] = c[k] || ""; }); return o; }
+function cdCong_(c) { var o = {}; ["ten", "khau", "dc", "sdt", "zalo", "gio", "ban_do", "chu_chay", "web", "giu_ngay", "banner", "banner_phu", "chay_gia", "chay_km", "banner_ds", "bn_km", "bn_gia"].forEach(function (k) { o[k] = c[k] || ""; }); return o; }
 function xem() {
-  var c = CacheService.getScriptCache(), n = +c.get("xem3_n");
-  if (n > 0) { var ps = c.getAll(Array.apply(null, Array(n)).map(function (_, i) { return "xem3_" + i; })), s = "";
-    for (var i = 0; i < n; i++) { if (ps["xem3_" + i] == null) { s = null; break; } s += ps["xem3_" + i]; }
+  var c = CacheService.getScriptCache(), n = +c.get("xem4_n");
+  if (n > 0) { var ps = c.getAll(Array.apply(null, Array(n)).map(function (_, i) { return "xem4_" + i; })), s = "";
+    for (var i = 0; i < n; i++) { if (ps["xem4_" + i] == null) { s = null; break; } s += ps["xem4_" + i]; }
     if (s) return JSON.parse(s); }
   var hom = ngayVN_(new Date());
   var o = { cd: cdCong_(cd_()), gia: giaVang_().filter(function (g) { return g.hien; }), ls: lichSu_(90),
     km: khuyenMai_().filter(function (k) { return k.bat && (!k.den || k.den >= hom); }),
     sp: sanPham_().filter(function (p) { return p.tt !== "an"; }), luc: new Date().toISOString() };
   var j = JSON.stringify(o), m = {}, k = Math.ceil(j.length / 90000);
-  for (var t = 0; t < k; t++) m["xem3_" + t] = j.slice(t * 90000, (t + 1) * 90000);
-  m.xem3_n = String(k); try { c.putAll(m, 21600); } catch (er) {}
+  for (var t = 0; t < k; t++) m["xem4_" + t] = j.slice(t * 90000, (t + 1) * 90000);
+  m.xem4_n = String(k); try { c.putAll(m, 21600); } catch (er) {}
   return o;
 }
 function giuMau(d) {
@@ -343,7 +343,7 @@ function xoaGiu(pin, ma) {
 
 // ---------------- bán hàng: mỗi mã = 1 món ----------------
 function banHang_() {
-  return doc_("BanHang").filter(function (r) { return r[0]; }).slice(-300).reverse().map(function (r) {
+  return doc_("BanHang").filter(function (r) { return r[0]; }).slice(-3000).reverse().map(function (r) {
     return { luc: iso_(r[0]), ma: String(r[1]), ten: String(r[2]), loai: String(r[3]), tl: +r[4] || 0, gia: +r[5] || 0, gc: String(r[6] || "") };
   });
 }
@@ -382,6 +382,39 @@ function ganNhan(pin, ma, o) {
     if ("nb" in o) sh.getRange(i, 10).setValue(o.nb ? "có" : "");
     if (o.nh) sh.getRange(i, 21).setValue(o.nh.filter(function (x) { return NHAN_.indexOf(x) >= 0; }).join(","));
     return { sp: sanPham_() };
+  });
+}
+
+// Cập nhật nhiều mẫu một lần: {tt}, {nb}, {them:"hot"}, {bo:"hot"}
+function capNhatNhieu(pin, dsMa, o) {
+  ktPin_(pin); o = o || {};
+  return khoa_(function () {
+    var sh = sh_("SanPham"), v = sh.getDataRange().getValues(), can = {}, n = 0;
+    (dsMa || []).forEach(function (m) { can[String(m)] = 1; });
+    for (var r = 1; r < v.length; r++) {
+      if (!can[String(v[r][0])]) continue; n++;
+      if (o.tt && ["hien", "an", "daban"].indexOf(o.tt) >= 0) { sh.getRange(r + 1, 11).setValue(o.tt); if (o.tt !== "daban") sh.getRange(r + 1, 19).setValue(""); }
+      if ("nb" in o) sh.getRange(r + 1, 10).setValue(o.nb ? "có" : "");
+      if (o.them || o.bo) {
+        var nh = String(v[r][20] || "").split(",").filter(function (x) { return NHAN_.indexOf(x) >= 0 && x !== o.bo; });
+        if (o.them && NHAN_.indexOf(o.them) >= 0 && nh.indexOf(o.them) < 0) nh.push(o.them);
+        sh.getRange(r + 1, 21).setValue(nh.join(","));
+      }
+    }
+    return { n: n, sp: sanPham_() };
+  });
+}
+// Banner trang chủ: danh sách [{anh, td, phu, nut, hd, bat}] lưu dạng JSON trong CaiDat
+function luuBanner(pin, ds) {
+  ktPin_(pin);
+  return khoa_(function () {
+    var ok = (ds || []).slice(0, 12).map(function (b) {
+      var hd = String(b.hd || "bst");
+      if (!/^(bst|km|gia|cua|nhom:.{1,40}|link:https?:\/\/.{3,300})$/.test(hd)) hd = "bst";
+      return { anh: chu_(b.anh, 120), td: chu_(b.td, 80), phu: chu_(b.phu, 200), nut: chu_(b.nut, 30), hd: hd.replace(/[<>"]/g, ""), bat: b.bat !== false, vt: ["trai", "giua", "phai"].indexOf(b.vt) >= 0 ? b.vt : "giua" };
+    });
+    cdGhi_("banner_ds", JSON.stringify(ok));
+    return cd_();
   });
 }
 
