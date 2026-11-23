@@ -10,14 +10,16 @@ var BANG_ = {
   CaiDat: ["Khoá", "Giá trị", "Cập nhật"],
   GiaVang: ["Mã", "Loại vàng", "Mua vào (đ/chỉ)", "Bán ra (đ/chỉ)", "Thứ tự", "Hiện", "Cập nhật"],
   LichSuGia: ["Thời gian", "Mã", "Mua vào", "Bán ra"],
-  SanPham: ["Mã", "Tên", "Nhóm", "Loại vàng", "Trọng lượng (chỉ)", "Tiền công", "Giá cố định", "Ảnh", "Mô tả", "Nổi bật", "Trạng thái", "Thứ tự", "Ngày tạo", "Kích cỡ"],
+  SanPham: ["Mã", "Tên", "Nhóm", "Loại vàng", "Trọng lượng (chỉ)", "Tiền công", "Giá cố định", "Ảnh", "Mô tả", "Nổi bật", "Trạng thái", "Thứ tự", "Ngày tạo", "Kích cỡ", "KM kiểu", "KM giá trị", "KM từ", "KM đến", "Ngày bán", "Số lần bán"],
+  BanHang: ["Thời gian", "Mã", "Tên", "Loại vàng", "Trọng lượng (chỉ)", "Giá bán", "Ghi chú"],
+  KhuyenMai: ["Mã", "Tên chương trình", "Mô tả", "Phạm vi", "Đối tượng", "Kiểu", "Giá trị", "Từ ngày", "Đến ngày", "Bật"],
   GiuMau: ["Mã", "Thời gian", "Mã SP", "Tên SP", "Khách", "SĐT", "Ghi chú", "Trạng thái", "Ngày đến"]
 };
 var CD_MAC_DINH_ = {
   ten: "Tiệm Vàng Thái Dương", khau: "Vàng thật – Giá thật – Uy tín 3 đời",
   dc: "Số 1 đường Trần Phú, TP Bắc Ninh", sdt: "0912345678", zalo: "0912345678",
   gio: "7:30 – 20:30 tất cả các ngày", ban_do: "", chu_chay: "Thu mua vàng cũ giá cao · Đổi vàng không mất công · Bảo hành trọn đời đánh bóng miễn phí",
-  web: "", giu_ngay: "3"
+  web: "", giu_ngay: "3", banner: "Tinh hoa vàng Việt", banner_phu: "Trang sức vàng 18K, 24K chế tác tinh xảo – kiểm định tuổi vàng, bảo hành trọn đời"
 };
 var GIA_MAU_ = [
   ["NT9999", "Nhẫn tròn trơn 9999", 15050000, 15350000],
@@ -45,11 +47,17 @@ function ss_() {
   if (!id) throw new Error("Chưa cài đặt. Chủ tiệm mở link ?caidat trước.");
   return SpreadsheetApp.openById(id);
 }
+var KT_ = {};
 function sh_(ten) {
   var s = ss_(), sh = s.getSheetByName(ten);
-  if (!sh) { sh = s.insertSheet(ten); sh.getRange(1, 1, 1, BANG_[ten].length).setValues([BANG_[ten]]).setFontWeight("bold"); sh.setFrozenRows(1); }
+  if (!sh) { sh = s.insertSheet(ten); sh.getRange(1, 1, 1, BANG_[ten].length).setValues([BANG_[ten]]).setFontWeight("bold"); sh.setFrozenRows(1); KT_[ten] = 1; }
+  if (!KT_[ten]) { KT_[ten] = 1; if (sh.getLastColumn() < BANG_[ten].length) sh.getRange(1, 1, 1, BANG_[ten].length).setValues([BANG_[ten]]).setFontWeight("bold"); }
   return sh;
 }
+// ngày theo giờ Việt Nam (UTC+7), dạng yyyy-mm-dd
+function ngayVN_(d) { return new Date(new Date(d).getTime() + 7 * 36e5).toISOString().slice(0, 10); }
+function ngayO_(v) { if (v instanceof Date) return ngayVN_(v); var x = String(v == null ? "" : v).replace(/^'/, "").trim(); return /^\d{4}-\d\d-\d\d$/.test(x) ? x : ""; }
+function ngayGhi_(v) { var x = ngayO_(v); return x ? "'" + x : ""; }
 function doc_(ten) {
   var v = sh_(ten).getDataRange().getValues(); v.shift();
   var n = BANG_[ten].length;
@@ -77,7 +85,7 @@ function bam_(s) {
 function iso_(d) { return d instanceof Date ? d.toISOString() : (d ? String(d) : ""); }
 function so_(x) { var n = +String(x).replace(/[^\d.\-]/g, ""); return isFinite(n) ? n : 0; }
 function chu_(x, max) { return String(x == null ? "" : x).replace(/[<>]/g, "").trim().slice(0, max || 200); }
-function xoaCache_() { var c = CacheService.getScriptCache(); c.remove("xem_n"); }
+function xoaCache_() { var c = CacheService.getScriptCache(); c.remove("xem2_n"); }
 function khoa_(f) {
   var l = LockService.getScriptLock(); l.waitLock(20000);
   try { return f(); } finally { xoaCache_(); l.releaseLock(); }
@@ -121,7 +129,7 @@ function json_(o) { return ContentService.createTextOutput(JSON.stringify(o)).se
 function boc_(f) { try { return { ok: true, kq: f() }; } catch (err) { return { ok: false, loi: String((err && err.message) || err) }; } }
 
 // ---------------- API POST ----------------
-var API_DS_ = ["xem", "giuMau", "trangThaiPin", "taoChu", "dangNhap", "quanLy", "luuGia", "luuSP", "xoaSP", "taiAnh", "xoaAnh", "doiGiu", "xoaGiu", "luuCaiDat", "doiPin", "sapXepSP"];
+var API_DS_ = ["xem", "giuMau", "trangThaiPin", "taoChu", "dangNhap", "quanLy", "luuGia", "luuGiaNgay", "luuKM", "xoaKM", "banSP", "nhapLaiSP", "luuSP", "xoaSP", "taiAnh", "xoaAnh", "doiGiu", "xoaGiu", "luuCaiDat", "doiPin", "sapXepSP"];
 function doPost(e) {
   return json_(boc_(function () {
     var b = JSON.parse((e && e.postData && e.postData.contents) || "{}"), ten = String(b.fn || "");
@@ -135,7 +143,8 @@ function sanPham_() {
   return doc_("SanPham").filter(function (r) { return r[0]; }).map(function (r) {
     return { ma: String(r[0]), ten: String(r[1]), nhom: String(r[2] || "Khác"), loai: String(r[3] || ""), tl: +r[4] || 0, cong: +r[5] || 0,
       gia: +r[6] || 0, anh: String(r[7] || "").split(",").filter(String), mt: String(r[8] || ""), nb: String(r[9]) === "có",
-      tt: String(r[10] || "hien"), stt: +r[11] || 0, ngay: iso_(r[12]), co: String(r[13] || "") };
+      tt: String(r[10] || "hien"), stt: +r[11] || 0, ngay: iso_(r[12]), co: String(r[13] || ""),
+      kmk: ["pt", "cong", "tien"].indexOf(String(r[14])) >= 0 ? String(r[14]) : "", kmv: +r[15] || 0, kmtu: ngayO_(r[16]), kmden: ngayO_(r[17]), ngayBan: iso_(r[18]), lan: +r[19] || 0 };
   }).sort(function (a, b) { return a.stt - b.stt; });
 }
 function giaVang_() {
@@ -148,17 +157,25 @@ function lichSu_(ngay) {
   return doc_("LichSuGia").filter(function (r) { return r[0] && new Date(r[0]).getTime() >= tu; })
     .map(function (r) { return [iso_(r[0]), String(r[1]), +r[2] || 0, +r[3] || 0]; });
 }
-function cdCong_(c) { var o = {}; ["ten", "khau", "dc", "sdt", "zalo", "gio", "ban_do", "chu_chay", "web", "giu_ngay"].forEach(function (k) { o[k] = c[k] || ""; }); return o; }
+function khuyenMai_() {
+  return doc_("KhuyenMai").filter(function (r) { return r[0]; }).map(function (r) {
+    return { ma: String(r[0]), ten: String(r[1]), mt: String(r[2] || ""), pv: String(r[3] || "tat"), dt: String(r[4] || ""), k: String(r[5] || "pt"), v: +r[6] || 0,
+      tu: ngayO_(r[7]), den: ngayO_(r[8]), bat: String(r[9]) !== "không" };
+  });
+}
+function cdCong_(c) { var o = {}; ["ten", "khau", "dc", "sdt", "zalo", "gio", "ban_do", "chu_chay", "web", "giu_ngay", "banner", "banner_phu"].forEach(function (k) { o[k] = c[k] || ""; }); return o; }
 function xem() {
-  var c = CacheService.getScriptCache(), n = +c.get("xem_n");
-  if (n > 0) { var ps = c.getAll(Array.apply(null, Array(n)).map(function (_, i) { return "xem_" + i; })), s = "";
-    for (var i = 0; i < n; i++) { if (ps["xem_" + i] == null) { s = null; break; } s += ps["xem_" + i]; }
+  var c = CacheService.getScriptCache(), n = +c.get("xem2_n");
+  if (n > 0) { var ps = c.getAll(Array.apply(null, Array(n)).map(function (_, i) { return "xem2_" + i; })), s = "";
+    for (var i = 0; i < n; i++) { if (ps["xem2_" + i] == null) { s = null; break; } s += ps["xem2_" + i]; }
     if (s) return JSON.parse(s); }
-  var o = { cd: cdCong_(cd_()), gia: giaVang_().filter(function (g) { return g.hien; }), ls: lichSu_(60),
+  var hom = ngayVN_(new Date());
+  var o = { cd: cdCong_(cd_()), gia: giaVang_().filter(function (g) { return g.hien; }), ls: lichSu_(90),
+    km: khuyenMai_().filter(function (k) { return k.bat && (!k.den || k.den >= hom); }),
     sp: sanPham_().filter(function (p) { return p.tt !== "an"; }), luc: new Date().toISOString() };
   var j = JSON.stringify(o), m = {}, k = Math.ceil(j.length / 90000);
-  for (var t = 0; t < k; t++) m["xem_" + t] = j.slice(t * 90000, (t + 1) * 90000);
-  m.xem_n = String(k); try { c.putAll(m, 21600); } catch (er) {}
+  for (var t = 0; t < k; t++) m["xem2_" + t] = j.slice(t * 90000, (t + 1) * 90000);
+  m.xem2_n = String(k); try { c.putAll(m, 21600); } catch (er) {}
   return o;
 }
 function giuMau(d) {
@@ -203,7 +220,7 @@ function quanLy(pin) {
   var giu = doc_("GiuMau").filter(function (r) { return r[0]; }).map(function (r) {
     return { ma: String(r[0]), luc: iso_(r[1]), masp: String(r[2]), tensp: String(r[3]), ten: String(r[4]), sdt: String(r[5]), gc: String(r[6]), tt: String(r[7] || "moi"), ngay: String(r[8] || "") };
   }).reverse();
-  return { cd: cd_(), gia: giaVang_(), sp: sanPham_(), giu: giu, ls: lichSu_(365), thuMuc: pr_().getProperty("THU_MUC") || "", ssId: pr_().getProperty("SS_ID") || "" };
+  return { cd: cd_(), gia: giaVang_(), sp: sanPham_(), km: khuyenMai_(), giu: giu, ls: lichSu_(400), ban: banHang_(), thuMuc: pr_().getProperty("THU_MUC") || "", ssId: pr_().getProperty("SS_ID") || "" };
 }
 function doiPin(pin, moi) {
   ktPin_(pin); moi = String(moi || "");
@@ -228,7 +245,27 @@ function luuGia(pin, ds) {
     var n = sh.getLastRow(); if (n > 1) sh.getRange(2, 1, n - 1, 7).clearContent();
     if (hang.length) sh.getRange(2, 1, hang.length, 7).setValues(hang);
     if (ls.length) { var l = sh_("LichSuGia"); l.getRange(l.getLastRow() + 1, 1, ls.length, 4).setValues(ls); }
-    return { doi: ls.length, gia: giaVang_() };
+    return { doi: ls.length, gia: giaVang_(), ls: lichSu_(400) };
+  });
+}
+// Sửa / nhập giá cho một ngày đã qua (hôm nay thì như luuGia). Ghi lúc 17:00 giờ VN của ngày đó.
+function luuGiaNgay(pin, ngay, ds) {
+  ktPin_(pin); ngay = ngayO_(ngay);
+  if (!ngay) throw new Error("Ngày chưa đúng.");
+  var hom = ngayVN_(new Date());
+  if (ngay > hom) throw new Error("Không đặt giá cho ngày chưa tới.");
+  if (ngay === hom) return luuGia(pin, ds);
+  return khoa_(function () {
+    var sh = sh_("LichSuGia"), mas = {};
+    (ds || []).forEach(function (g) { mas[String(g.ma)] = 1; });
+    var giu = doc_("LichSuGia").filter(function (r) { return r[0] && !(mas[String(r[1])] && ngayVN_(r[0]) === ngay); })
+      .map(function (r) { return [new Date(r[0]), String(r[1]), +r[2] || 0, +r[3] || 0]; });
+    var luc = new Date(ngay + "T10:00:00Z");
+    (ds || []).forEach(function (g) { if (so_(g.ban) > 0 || so_(g.mua) > 0) giu.push([luc, String(g.ma), Math.round(so_(g.mua)), Math.round(so_(g.ban))]); });
+    giu.sort(function (a, b) { return a[0] - b[0]; });
+    var n = sh.getLastRow(); if (n > 1) sh.getRange(2, 1, n - 1, 4).clearContent();
+    if (giu.length) sh.getRange(2, 1, giu.length, 4).setValues(giu);
+    return { gia: giaVang_(), ls: lichSu_(400) };
   });
 }
 
@@ -240,13 +277,18 @@ function luuSP(pin, p) {
     if (!chu_(p.ten)) throw new Error("Chưa nhập tên sản phẩm.");
     var i = ma ? dongCua_("SanPham", ma) : -1, cu = ds.filter(function (x) { return x.ma === ma; })[0];
     if (i < 0) {
-      var max = 0; ds.forEach(function (x) { var m = +x.ma.replace(/\D/g, ""); if (m > max) max = m; });
-      ma = "SP" + ("000" + (max + 1)).slice(-4);
+      var tu = String(p.maMoi || "").toUpperCase().replace(/\s+/g, "").replace(/[^A-Z0-9\-_.]/g, "").slice(0, 24);
+      if (tu) { if (dongCua_("SanPham", tu) > 0) throw new Error("Mã " + tu + " đã có. Hàng về lại thì dùng \"Nhập lại\" cho mã cũ."); ma = tu; }
+      else { var max = 0; ds.forEach(function (x) { var m = +String(x.ma).replace(/\D/g, ""); if (/^SP\d+$/.test(x.ma) && m > max) max = m; }); ma = "SP" + ("000" + (max + 1)).slice(-4); }
     }
+    var kmk = ["pt", "cong", "tien"].indexOf(p.kmk) >= 0 && so_(p.kmv) > 0 ? p.kmk : "";
+    if (kmk && kmk !== "tien" && so_(p.kmv) > 100) throw new Error("Giảm theo % tối đa 100.");
     var row = [ma, chu_(p.ten, 120), chu_(p.nhom, 40) || "Khác", chu_(p.loai, 20), so_(p.tl), Math.round(so_(p.cong)), Math.round(so_(p.gia)),
       (p.anh || []).map(String).join(","), chu_(p.mt, 1500), p.nb ? "có" : "", ["hien", "an", "daban"].indexOf(p.tt) >= 0 ? p.tt : "hien",
-      cu ? cu.stt : (ds.length ? Math.max.apply(null, ds.map(function (x) { return x.stt; })) + 1 : 1), cu && cu.ngay ? new Date(cu.ngay) : new Date(), chu_(p.co, 60)];
-    if (i > 0) sh.getRange(i, 1, 1, 14).setValues([row]); else sh.appendRow(row);
+      cu ? cu.stt : (ds.length ? Math.max.apply(null, ds.map(function (x) { return x.stt; })) + 1 : 1), cu && cu.ngay ? new Date(cu.ngay) : new Date(), chu_(p.co, 60),
+      kmk, kmk ? so_(p.kmv) : "", kmk ? ngayGhi_(p.kmtu) : "", kmk ? ngayGhi_(p.kmden) : "",
+      (p.tt === "daban" ? (cu && cu.ngayBan ? new Date(cu.ngayBan) : new Date()) : ""), cu ? cu.lan : 0];
+    if (i > 0) sh.getRange(i, 1, 1, 20).setValues([row]); else sh.appendRow(row);
     return { ma: ma, sp: sanPham_() };
   });
 }
@@ -294,6 +336,61 @@ function doiGiu(pin, ma, tt) {
 function xoaGiu(pin, ma) {
   ktPin_(pin);
   return khoa_(function () { var i = dongCua_("GiuMau", ma); if (i > 0) sh_("GiuMau").deleteRow(i); return quanLy(pin).giu; });
+}
+
+// ---------------- bán hàng: mỗi mã = 1 món ----------------
+function banHang_() {
+  return doc_("BanHang").filter(function (r) { return r[0]; }).slice(-300).reverse().map(function (r) {
+    return { luc: iso_(r[0]), ma: String(r[1]), ten: String(r[2]), loai: String(r[3]), tl: +r[4] || 0, gia: +r[5] || 0, gc: String(r[6] || "") };
+  });
+}
+function banSP(pin, ma, gia, gc) {
+  ktPin_(pin);
+  return khoa_(function () {
+    ma = String(ma || "").trim().toUpperCase();
+    var i = dongCua_("SanPham", ma); if (i < 0) throw new Error("Không có mã " + ma);
+    var sp = sanPham_().filter(function (x) { return x.ma === ma; })[0];
+    if (sp.tt === "daban") throw new Error("Mã " + ma + " đã bán rồi" + (sp.ngayBan ? " (ngày " + ngayVN_(sp.ngayBan).split("-").reverse().join("/") + ")" : "") + ". Hàng về lại thì bấm Nhập lại.");
+    var now = new Date(), sh = sh_("SanPham");
+    sh.getRange(i, 11).setValue("daban"); sh.getRange(i, 19, 1, 2).setValues([[now, (sp.lan || 0) + 1]]);
+    sh_("BanHang").appendRow([now, sp.ma, sp.ten, sp.loai, sp.tl, Math.round(so_(gia)), chu_(gc, 200)]);
+    return { sp: sanPham_(), ban: banHang_() };
+  });
+}
+// Hàng về lại đúng mẫu cũ: dùng lại mã cũ, bày bán lại (có thể sửa trọng lượng / tiền công của món mới)
+function nhapLaiSP(pin, ma, o) {
+  ktPin_(pin); o = o || {};
+  return khoa_(function () {
+    var i = dongCua_("SanPham", ma); if (i < 0) throw new Error("Không có mã " + ma);
+    var sh = sh_("SanPham");
+    sh.getRange(i, 11).setValue("hien"); sh.getRange(i, 19).setValue("");
+    if (o.tl != null && so_(o.tl) > 0) sh.getRange(i, 5).setValue(so_(o.tl));
+    if (o.cong != null && o.cong !== "") sh.getRange(i, 6).setValue(Math.round(so_(o.cong)));
+    return { sp: sanPham_() };
+  });
+}
+
+// ---------------- chương trình khuyến mãi ----------------
+function luuKM(pin, k) {
+  ktPin_(pin); k = k || {};
+  return khoa_(function () {
+    if (!chu_(k.ten)) throw new Error("Chưa nhập tên chương trình.");
+    var kieu = ["pt", "cong", "tien"].indexOf(k.k) >= 0 ? k.k : "pt", v = so_(k.v);
+    if (!(v > 0)) throw new Error("Chưa nhập mức giảm.");
+    if (kieu !== "tien" && v > 100) throw new Error("Giảm theo % tối đa 100.");
+    var tu = ngayO_(k.tu), den = ngayO_(k.den);
+    if (tu && den && den < tu) throw new Error("Ngày kết thúc trước ngày bắt đầu.");
+    var sh = sh_("KhuyenMai"), ma = String(k.ma || ""), i = ma ? dongCua_("KhuyenMai", ma) : -1;
+    if (i < 0) ma = "KM" + Date.now().toString(36).toUpperCase();
+    var row = [ma, chu_(k.ten, 80), chu_(k.mt, 300), ["tat", "nhom", "loai"].indexOf(k.pv) >= 0 ? k.pv : "tat", chu_(k.dt, 40), kieu, v,
+      tu ? "'" + tu : "", den ? "'" + den : "", k.bat === false ? "không" : "có"];
+    if (i > 0) sh.getRange(i, 1, 1, 10).setValues([row]); else sh.appendRow(row);
+    return { km: khuyenMai_() };
+  });
+}
+function xoaKM(pin, ma) {
+  ktPin_(pin);
+  return khoa_(function () { var i = dongCua_("KhuyenMai", ma); if (i > 0) sh_("KhuyenMai").deleteRow(i); return { km: khuyenMai_() }; });
 }
 
 // ---------------- cài đặt ----------------
