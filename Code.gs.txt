@@ -1,0 +1,306 @@
+/* ============================================================
+   TIỆM VÀNG – máy chủ (Google Apps Script + Google Sheets)
+   - Khách: GET ?api=xem  → bảng giá + mẫu đang bày (JSON, có cache)
+            POST {fn:"giuMau"} → đặt giữ mẫu
+   - Chủ tiệm: POST {fn, args:[PIN, ...]} (trang Quản lý)
+   - Cài đặt lần đầu: mở <link /exec>?caidat bằng tài khoản chủ
+   ============================================================ */
+
+var BANG_ = {
+  CaiDat: ["Khoá", "Giá trị", "Cập nhật"],
+  GiaVang: ["Mã", "Loại vàng", "Mua vào (đ/chỉ)", "Bán ra (đ/chỉ)", "Thứ tự", "Hiện", "Cập nhật"],
+  LichSuGia: ["Thời gian", "Mã", "Mua vào", "Bán ra"],
+  SanPham: ["Mã", "Tên", "Nhóm", "Loại vàng", "Trọng lượng (chỉ)", "Tiền công", "Giá cố định", "Ảnh", "Mô tả", "Nổi bật", "Trạng thái", "Thứ tự", "Ngày tạo", "Kích cỡ"],
+  GiuMau: ["Mã", "Thời gian", "Mã SP", "Tên SP", "Khách", "SĐT", "Ghi chú", "Trạng thái", "Ngày đến"]
+};
+var CD_MAC_DINH_ = {
+  ten: "Tiệm Vàng Thái Dương", khau: "Vàng thật – Giá thật – Uy tín 3 đời",
+  dc: "Số 1 đường Trần Phú, TP Bắc Ninh", sdt: "0912345678", zalo: "0912345678",
+  gio: "7:30 – 20:30 tất cả các ngày", ban_do: "", chu_chay: "Thu mua vàng cũ giá cao · Đổi vàng không mất công · Bảo hành trọn đời đánh bóng miễn phí",
+  web: "", giu_ngay: "3"
+};
+var GIA_MAU_ = [
+  ["NT9999", "Nhẫn tròn trơn 9999", 15050000, 15350000],
+  ["V24K", "Vàng trang sức 24K (9999)", 14900000, 15300000],
+  ["V18K", "Vàng 18K (750)", 10950000, 11550000],
+  ["V14K", "Vàng 14K (585)", 8300000, 8950000],
+  ["V10K", "Vàng 10K (416)", 5800000, 6450000],
+  ["BAC", "Bạc 925", 190000, 280000]
+];
+var SP_MAU_ = [
+  ["Nhẫn trơn ép vỉ 9999", "Nhẫn", "NT9999", 1, 0, 0, "svg:nhan", "Nhẫn tròn trơn vàng 9999, ép vỉ có tem, mua bán theo giá niêm yết.", true, "", "1 chỉ"],
+  ["Nhẫn nữ đính đá chủ", "Nhẫn", "V18K", 0.85, 650000, 0, "svg:nhan-da", "Nhẫn nữ ổ chấu 6 chân, đá CZ 6 ly sáng lấp lánh.", true, "", "Ni 10–14"],
+  ["Dây chuyền mắt xích", "Dây chuyền", "V18K", 2, 900000, 0, "svg:day", "Dây mắt xích dẹt, dài 45 cm, khoá chữ S chắc chắn.", true, "", "45 cm"],
+  ["Mặt dây cỏ 4 lá", "Mặt dây", "V14K", 0.6, 450000, 0, "svg:mat", "Mặt cỏ 4 lá cẩn đá, mang lại may mắn.", false, "", ""],
+  ["Bông tai giọt nước", "Bông tai", "V18K", 0.7, 550000, 0, "svg:bong", "Bông tai giọt nước đính đá, chốt vặn an toàn.", true, "", "Đôi"],
+  ["Lắc tay ngọc trai", "Lắc / Vòng", "V14K", 1.2, 800000, 0, "svg:lac", "Lắc tay xích nhỏ điểm ngọc trai nước ngọt.", false, "", "17 cm"],
+  ["Nhẫn cưới cặp trơn", "Nhẫn cưới", "V18K", 2.4, 1200000, 0, "svg:cuoi", "Cặp nhẫn cưới trơn bóng, khắc tên miễn phí.", true, "", "Cặp"],
+  ["Lắc bạc trẻ em", "Lắc / Vòng", "BAC", 1.5, 120000, 0, "svg:lac", "Lắc bạc 925 cho bé, có chuông nhỏ.", false, "", ""]
+];
+var KHOA_SAI_ = 5, KHOA_PHUT_ = 15;
+
+// ---------------- tiện ích ----------------
+function ss_() {
+  var id = PropertiesService.getScriptProperties().getProperty("SS_ID");
+  if (!id) throw new Error("Chưa cài đặt. Chủ tiệm mở link ?caidat trước.");
+  return SpreadsheetApp.openById(id);
+}
+function sh_(ten) {
+  var s = ss_(), sh = s.getSheetByName(ten);
+  if (!sh) { sh = s.insertSheet(ten); sh.getRange(1, 1, 1, BANG_[ten].length).setValues([BANG_[ten]]).setFontWeight("bold"); sh.setFrozenRows(1); }
+  return sh;
+}
+function doc_(ten) {
+  var v = sh_(ten).getDataRange().getValues(); v.shift();
+  var n = BANG_[ten].length;
+  return v.map(function (r) { while (r.length < n) r.push(""); return r; });
+}
+function dongCua_(ten, ma) {
+  var v = sh_(ten).getDataRange().getValues();
+  for (var i = 1; i < v.length; i++) if (String(v[i][0]) === String(ma)) return i + 1;
+  return -1;
+}
+function cd_() {
+  var o = {}; for (var k in CD_MAC_DINH_) o[k] = CD_MAC_DINH_[k];
+  doc_("CaiDat").forEach(function (r) { if (r[0] && String(r[0]).charAt(0) !== "_") o[String(r[0])] = String(r[1]); });
+  return o;
+}
+function cdGhi_(khoa, gt) {
+  var sh = sh_("CaiDat"), i = dongCua_("CaiDat", khoa), row = [khoa, String(gt), new Date()];
+  if (i > 0) sh.getRange(i, 1, 1, 3).setValues([row]); else sh.appendRow(row);
+}
+function pr_() { return PropertiesService.getScriptProperties(); }
+function bam_(s) {
+  var b = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, String(s), Utilities.Charset.UTF_8);
+  return b.map(function (x) { return ((x + 256) % 256).toString(16).replace(/^(.)$/, "0$1"); }).join("");
+}
+function iso_(d) { return d instanceof Date ? d.toISOString() : (d ? String(d) : ""); }
+function so_(x) { var n = +String(x).replace(/[^\d.\-]/g, ""); return isFinite(n) ? n : 0; }
+function chu_(x, max) { return String(x == null ? "" : x).replace(/[<>]/g, "").trim().slice(0, max || 200); }
+function xoaCache_() { var c = CacheService.getScriptCache(); c.remove("xem_n"); }
+function khoa_(f) {
+  var l = LockService.getScriptLock(); l.waitLock(20000);
+  try { return f(); } finally { xoaCache_(); l.releaseLock(); }
+}
+
+// ---------------- cài đặt lần đầu ----------------
+function caiDatLanDau() {
+  var p = pr_();
+  if (!p.getProperty("SS_ID")) {
+    var s = SpreadsheetApp.create("Tiệm Vàng – dữ liệu");
+    p.setProperty("SS_ID", s.getId());
+    for (var ten in BANG_) sh_(ten);
+    var mac = s.getSheetByName("Sheet1") || s.getSheetByName("Trang tính1"); if (mac && s.getSheets().length > 1) s.deleteSheet(mac);
+    var now = new Date();
+    sh_("GiaVang").getRange(2, 1, GIA_MAU_.length, 7).setValues(GIA_MAU_.map(function (g, i) { return [g[0], g[1], g[2], g[3], i + 1, "có", now]; }));
+    sh_("LichSuGia").getRange(2, 1, GIA_MAU_.length, 4).setValues(GIA_MAU_.map(function (g) { return [now, g[0], g[2], g[3]]; }));
+    sh_("SanPham").getRange(2, 1, SP_MAU_.length, 14).setValues(SP_MAU_.map(function (s, i) {
+      return ["SP" + ("000" + (i + 1)).slice(-4), s[0], s[1], s[2], s[3], s[4], s[5], s[6], s[7], s[8] ? "có" : "", "hien", i + 1, now, s[10]];
+    }));
+    sh_("SanPham").getRange("A:A").setNumberFormat("@"); sh_("GiuMau").getRange("F:F").setNumberFormat("@");
+  }
+  if (!p.getProperty("THU_MUC")) p.setProperty("THU_MUC", DriveApp.createFolder("Tiệm Vàng – ảnh sản phẩm").getId());
+  xoaCache_();
+  return p.getProperty("SS_ID");
+}
+
+// ---------------- trang GET ----------------
+function doGet(e) {
+  var q = (e && e.parameter) || {};
+  if (q.api === "xem") return json_(boc_(function () { return xem(); }));
+  if (q.caidat !== undefined) {
+    var toi = Session.getActiveUser().getEmail(), chu = Session.getEffectiveUser().getEmail();
+    if (!toi || toi !== chu) return HtmlService.createHtmlOutput("Chỉ chủ tiệm mở được trang này.");
+    var id = caiDatLanDau();
+    return HtmlService.createHtmlOutput('<div style="font:16px Arial;padding:24px;line-height:1.6"><h2>Đã cài đặt xong ✓</h2>File dữ liệu: <a target="_top" href="https://docs.google.com/spreadsheets/d/' + id + '">mở Google Sheets</a></div>').setTitle("Cài đặt tiệm vàng");
+  }
+  var web = ""; try { web = cd_().web; } catch (er) {}
+  return HtmlService.createHtmlOutput('<div style="font:16px Arial;padding:24px">Máy chủ Tiệm Vàng đang chạy.' + (web ? ' Mở trang: <a target="_top" href="' + web + '">' + web + '</a>' : '') + '</div>');
+}
+function json_(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
+function boc_(f) { try { return { ok: true, kq: f() }; } catch (err) { return { ok: false, loi: String((err && err.message) || err) }; } }
+
+// ---------------- API POST ----------------
+var API_DS_ = ["xem", "giuMau", "trangThaiPin", "taoChu", "dangNhap", "quanLy", "luuGia", "luuSP", "xoaSP", "taiAnh", "xoaAnh", "doiGiu", "xoaGiu", "luuCaiDat", "doiPin", "sapXepSP"];
+function doPost(e) {
+  return json_(boc_(function () {
+    var b = JSON.parse((e && e.postData && e.postData.contents) || "{}"), ten = String(b.fn || "");
+    if (API_DS_.indexOf(ten) < 0 || typeof globalThis[ten] !== "function") throw new Error("Không có chức năng " + ten);
+    return globalThis[ten].apply(null, Array.isArray(b.args) ? b.args : []);
+  }));
+}
+
+// ---------------- phần khách xem ----------------
+function sanPham_() {
+  return doc_("SanPham").filter(function (r) { return r[0]; }).map(function (r) {
+    return { ma: String(r[0]), ten: String(r[1]), nhom: String(r[2] || "Khác"), loai: String(r[3] || ""), tl: +r[4] || 0, cong: +r[5] || 0,
+      gia: +r[6] || 0, anh: String(r[7] || "").split(",").filter(String), mt: String(r[8] || ""), nb: String(r[9]) === "có",
+      tt: String(r[10] || "hien"), stt: +r[11] || 0, ngay: iso_(r[12]), co: String(r[13] || "") };
+  }).sort(function (a, b) { return a.stt - b.stt; });
+}
+function giaVang_() {
+  return doc_("GiaVang").filter(function (r) { return r[0]; }).map(function (r) {
+    return { ma: String(r[0]), ten: String(r[1]), mua: +r[2] || 0, ban: +r[3] || 0, stt: +r[4] || 0, hien: String(r[5]) !== "không", lc: iso_(r[6]) };
+  }).sort(function (a, b) { return a.stt - b.stt; });
+}
+function lichSu_(ngay) {
+  var tu = Date.now() - (ngay || 60) * 864e5;
+  return doc_("LichSuGia").filter(function (r) { return r[0] && new Date(r[0]).getTime() >= tu; })
+    .map(function (r) { return [iso_(r[0]), String(r[1]), +r[2] || 0, +r[3] || 0]; });
+}
+function cdCong_(c) { var o = {}; ["ten", "khau", "dc", "sdt", "zalo", "gio", "ban_do", "chu_chay", "web", "giu_ngay"].forEach(function (k) { o[k] = c[k] || ""; }); return o; }
+function xem() {
+  var c = CacheService.getScriptCache(), n = +c.get("xem_n");
+  if (n > 0) { var ps = c.getAll(Array.apply(null, Array(n)).map(function (_, i) { return "xem_" + i; })), s = "";
+    for (var i = 0; i < n; i++) { if (ps["xem_" + i] == null) { s = null; break; } s += ps["xem_" + i]; }
+    if (s) return JSON.parse(s); }
+  var o = { cd: cdCong_(cd_()), gia: giaVang_().filter(function (g) { return g.hien; }), ls: lichSu_(60),
+    sp: sanPham_().filter(function (p) { return p.tt !== "an"; }), luc: new Date().toISOString() };
+  var j = JSON.stringify(o), m = {}, k = Math.ceil(j.length / 90000);
+  for (var t = 0; t < k; t++) m["xem_" + t] = j.slice(t * 90000, (t + 1) * 90000);
+  m.xem_n = String(k); try { c.putAll(m, 21600); } catch (er) {}
+  return o;
+}
+function giuMau(d) {
+  d = d || {};
+  var sdt = String(d.sdt || "").replace(/[^\d+]/g, ""), ten = chu_(d.ten, 60);
+  if (!ten) throw new Error("Anh/chị vui lòng nhập tên.");
+  if (sdt.replace(/\D/g, "").length < 9) throw new Error("Số điện thoại chưa đúng.");
+  var c = CacheService.getScriptCache(), dem = +c.get("giu_" + sdt) || 0;
+  if (dem >= 5) throw new Error("Anh/chị đã gửi nhiều yêu cầu, tiệm sẽ gọi lại sớm ạ.");
+  c.put("giu_" + sdt, String(dem + 1), 3600);
+  return khoa_(function () {
+    var sp = sanPham_().filter(function (p) { return p.ma === String(d.ma || ""); })[0];
+    var ma = "GM" + Utilities.formatDate(new Date(), "Asia/Ho_Chi_Minh", "yyMMddHHmmss");
+    sh_("GiuMau").appendRow([ma, new Date(), sp ? sp.ma : "", sp ? sp.ten : chu_(d.tenSP, 80), ten, sdt, chu_(d.gc, 300), "moi", chu_(d.ngay, 30)]);
+    return { ma: ma };
+  });
+}
+
+// ---------------- đăng nhập chủ tiệm ----------------
+function trangThaiPin() { return { coPin: !!pr_().getProperty("PIN_BAM") }; }
+function taoChu(pin) {
+  pin = String(pin || "");
+  if (pr_().getProperty("PIN_BAM")) throw new Error("Tiệm đã có mã PIN.");
+  if (!/^\d{4,8}$/.test(pin)) throw new Error("Mã PIN gồm 4–8 chữ số.");
+  var muoi = Utilities.getUuid(); pr_().setProperties({ PIN_MUOI: muoi, PIN_BAM: bam_(muoi + pin) });
+  return dangNhap(pin);
+}
+function ktPin_(pin) {
+  var c = CacheService.getScriptCache(), sai = +c.get("pin_sai") || 0;
+  if (sai >= KHOA_SAI_) throw new Error("Nhập sai nhiều lần. Thử lại sau " + KHOA_PHUT_ + " phút.");
+  var p = pr_(), bam = p.getProperty("PIN_BAM");
+  if (!bam) throw new Error("Chưa tạo mã PIN.");
+  if (bam_(p.getProperty("PIN_MUOI") + String(pin || "")) !== bam) {
+    c.put("pin_sai", String(sai + 1), KHOA_PHUT_ * 60);
+    throw new Error("Sai mã PIN (còn " + (KHOA_SAI_ - sai - 1) + " lần).");
+  }
+  c.remove("pin_sai");
+}
+function dangNhap(pin) { ktPin_(pin); return quanLy(pin); }
+function quanLy(pin) {
+  ktPin_(pin);
+  var giu = doc_("GiuMau").filter(function (r) { return r[0]; }).map(function (r) {
+    return { ma: String(r[0]), luc: iso_(r[1]), masp: String(r[2]), tensp: String(r[3]), ten: String(r[4]), sdt: String(r[5]), gc: String(r[6]), tt: String(r[7] || "moi"), ngay: String(r[8] || "") };
+  }).reverse();
+  return { cd: cd_(), gia: giaVang_(), sp: sanPham_(), giu: giu, ls: lichSu_(365), thuMuc: pr_().getProperty("THU_MUC") || "", ssId: pr_().getProperty("SS_ID") || "" };
+}
+function doiPin(pin, moi) {
+  ktPin_(pin); moi = String(moi || "");
+  if (!/^\d{4,8}$/.test(moi)) throw new Error("Mã PIN gồm 4–8 chữ số.");
+  var muoi = Utilities.getUuid(); pr_().setProperties({ PIN_MUOI: muoi, PIN_BAM: bam_(muoi + moi) });
+  return true;
+}
+
+// ---------------- giá vàng ----------------
+function luuGia(pin, ds) {
+  ktPin_(pin);
+  return khoa_(function () {
+    var cu = {}; giaVang_().forEach(function (g) { cu[g.ma] = g; });
+    var now = new Date(), sh = sh_("GiaVang"), ls = [], hang = [];
+    (ds || []).forEach(function (g, i) {
+      var ma = chu_(g.ma, 20).toUpperCase().replace(/[^A-Z0-9_]/g, "") || ("LV" + (i + 1));
+      var mua = Math.round(so_(g.mua)), ban = Math.round(so_(g.ban)), c = cu[ma];
+      var doi = !c || c.mua !== mua || c.ban !== ban;
+      hang.push([ma, chu_(g.ten, 80) || ma, mua, ban, i + 1, g.hien === false ? "không" : "có", doi ? now : (c.lc ? new Date(c.lc) : now)]);
+      if (doi) ls.push([now, ma, mua, ban]);
+    });
+    var n = sh.getLastRow(); if (n > 1) sh.getRange(2, 1, n - 1, 7).clearContent();
+    if (hang.length) sh.getRange(2, 1, hang.length, 7).setValues(hang);
+    if (ls.length) { var l = sh_("LichSuGia"); l.getRange(l.getLastRow() + 1, 1, ls.length, 4).setValues(ls); }
+    return { doi: ls.length, gia: giaVang_() };
+  });
+}
+
+// ---------------- sản phẩm ----------------
+function luuSP(pin, p) {
+  ktPin_(pin); p = p || {};
+  return khoa_(function () {
+    var sh = sh_("SanPham"), ds = sanPham_(), ma = String(p.ma || "");
+    if (!chu_(p.ten)) throw new Error("Chưa nhập tên sản phẩm.");
+    var i = ma ? dongCua_("SanPham", ma) : -1, cu = ds.filter(function (x) { return x.ma === ma; })[0];
+    if (i < 0) {
+      var max = 0; ds.forEach(function (x) { var m = +x.ma.replace(/\D/g, ""); if (m > max) max = m; });
+      ma = "SP" + ("000" + (max + 1)).slice(-4);
+    }
+    var row = [ma, chu_(p.ten, 120), chu_(p.nhom, 40) || "Khác", chu_(p.loai, 20), so_(p.tl), Math.round(so_(p.cong)), Math.round(so_(p.gia)),
+      (p.anh || []).map(String).join(","), chu_(p.mt, 1500), p.nb ? "có" : "", ["hien", "an", "daban"].indexOf(p.tt) >= 0 ? p.tt : "hien",
+      cu ? cu.stt : (ds.length ? Math.max.apply(null, ds.map(function (x) { return x.stt; })) + 1 : 1), cu && cu.ngay ? new Date(cu.ngay) : new Date(), chu_(p.co, 60)];
+    if (i > 0) sh.getRange(i, 1, 1, 14).setValues([row]); else sh.appendRow(row);
+    return { ma: ma, sp: sanPham_() };
+  });
+}
+function xoaSP(pin, ma) {
+  ktPin_(pin);
+  return khoa_(function () {
+    var i = dongCua_("SanPham", ma); if (i < 0) throw new Error("Không thấy sản phẩm " + ma);
+    var sp = sanPham_().filter(function (x) { return x.ma === ma; })[0];
+    if (sp) sp.anh.forEach(function (id) { boAnh_(id); });
+    sh_("SanPham").deleteRow(i);
+    return { sp: sanPham_() };
+  });
+}
+function sapXepSP(pin, dsMa) {
+  ktPin_(pin);
+  return khoa_(function () {
+    var sh = sh_("SanPham"), v = sh.getDataRange().getValues(), vt = {};
+    (dsMa || []).forEach(function (m, i) { vt[m] = i + 1; });
+    for (var r = 1; r < v.length; r++) if (vt[v[r][0]]) sh.getRange(r + 1, 12).setValue(vt[v[r][0]]);
+    return { sp: sanPham_() };
+  });
+}
+// Ảnh: lưu trong thư mục Drive riêng, chia sẻ "ai có link đều xem được" để trang khách hiện được.
+function taiAnh(pin, b64, ten) {
+  ktPin_(pin);
+  var s = String(b64 || "").replace(/^data:[^,]+,/, "");
+  if (s.length > 4e6) throw new Error("Ảnh quá lớn.");
+  var blob = Utilities.newBlob(Utilities.base64Decode(s), "image/jpeg", chu_(ten, 60) || ("anh_" + Date.now() + ".jpg"));
+  var f = DriveApp.getFolderById(pr_().getProperty("THU_MUC")).createFile(blob);
+  f.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  return { id: f.getId() };
+}
+function boAnh_(id) { if (!id || /^svg:/.test(id)) return; try { DriveApp.getFileById(id).setTrashed(true); } catch (e) {} }
+function xoaAnh(pin, id) { ktPin_(pin); boAnh_(id); return true; }
+
+// ---------------- giữ mẫu ----------------
+function doiGiu(pin, ma, tt) {
+  ktPin_(pin);
+  return khoa_(function () {
+    var i = dongCua_("GiuMau", ma); if (i < 0) throw new Error("Không thấy yêu cầu " + ma);
+    sh_("GiuMau").getRange(i, 8).setValue(["moi", "goi", "xong", "huy"].indexOf(tt) >= 0 ? tt : "moi");
+    return quanLy(pin).giu;
+  });
+}
+function xoaGiu(pin, ma) {
+  ktPin_(pin);
+  return khoa_(function () { var i = dongCua_("GiuMau", ma); if (i > 0) sh_("GiuMau").deleteRow(i); return quanLy(pin).giu; });
+}
+
+// ---------------- cài đặt ----------------
+function luuCaiDat(pin, o) {
+  ktPin_(pin);
+  return khoa_(function () {
+    Object.keys(CD_MAC_DINH_).forEach(function (k) { if (o && k in o) cdGhi_(k, chu_(o[k], 600)); });
+    return cd_();
+  });
+}
