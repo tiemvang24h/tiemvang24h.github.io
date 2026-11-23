@@ -602,6 +602,125 @@ body.ql-mo{background:#f3efe9}
 .bang-them i svg{width:22px;height:22px}
 .bang-them .dem{position:absolute;top:8px;right:10px;margin:0}
 @media(max-width:900px){body.ql-mo{font-size:15.5px}.ql-the{padding:15px 14px;border-radius:14px}.ql-the h3{font-size:16.5px}.ql-the h3 .phai{margin-left:0;width:100%}.ql-the h3 .phai .nut{flex:1}.kpi b{font-size:21px}}
+/* ===== v5: bản điện thoại gọn, thoáng ===== */
+.ql-logo-dt{display:none}
+.thanh-ngay{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.tn-1,.tn-2{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.doi-nhanh{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+@media(max-width:760px){
+ body{font-size:14.5px}
+ .tb{display:none}
+ .hd .khung{height:58px;gap:10px}
+ .mn{top:58px}
+ .mn a{font-size:13.5px;padding:11px 12px}
+ .mn a.chon:after,.mn a:hover:after{left:12px;right:12px;bottom:5px}
+ .logo{gap:9px}.logo b{font-size:17px}.logo small{font-size:9.5px;letter-spacing:1.1px;margin-top:2px}
+ .logo-dau{width:36px;height:36px}
+ .hd-nut a.goi i,#mo-tim{width:38px!important;height:38px!important}
+ .cc{font-size:12.5px}.cc-noi{padding:7px 0}.cc-nhan{padding:0 11px}
+ .dau-trang{padding:14px 0 4px}
+ .dau-luoi{gap:14px}
+ /* banner: chữ nằm dưới, hình trang trí mờ phía sau – không đè chữ */
+ .bn{min-height:380px;border-radius:18px}
+ .sl{grid-template-columns:1fr;grid-template-rows:none;padding:24px 20px 54px;align-content:end}
+ .sl .hinh{position:absolute;right:-46px;top:6px;width:240px;height:240px;min-height:0;opacity:.32;z-index:0;pointer-events:none}
+ .sl .hinh svg{width:240px}
+ .sl .tren{font-size:10.5px;letter-spacing:1.8px}
+ .sl h2{font-size:28px;margin:8px 0 8px}
+ .sl p{font-size:13.5px;margin:0 0 16px}
+ .sl .so-to{font-size:42px}
+ .sl .nuts .nut{height:42px;padding:0 16px;font-size:14px}
+ .cham-bn{left:20px;bottom:18px}
+ .mui-bn{display:none}
+ /* bảng giá: mỗi loại vàng 1 thẻ, tên 1 dòng, 2 ô Mua/Bán */
+ .bgc{border-radius:18px}
+ .bgc-dau{padding:14px 14px 12px}
+ .bgc-dau .dong2{flex-direction:column;align-items:stretch;gap:8px}
+ .chon-ngay{width:100%;height:38px}
+ .bgc thead{display:none}
+ .bgc table,.bgc tbody{display:block}
+ .bgc tr{display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;padding:12px 14px;border-bottom:1px solid #f3ece2}
+ .bgc td{padding:0!important;border:0!important;background:none}
+ .bgc tr:hover td{background:none}
+ .bgc td:first-child{grid-column:1/-1;font-size:14.5px;font-weight:700}
+ .bgc td[data-n]{text-align:left;background:#faf6ef!important;border-radius:10px;padding:8px 10px!important}
+ .bgc td.ban[data-n]{background:#fdf1ef!important}
+ .bgc td[data-n]:before{content:attr(data-n);display:block;font-size:10.5px;color:var(--mo);text-transform:uppercase;letter-spacing:.7px;font-weight:600;margin-bottom:1px}
+ .bgc td b{font-size:17px;display:inline}
+ .bgc td .doi{margin-left:6px}
+ .bgc-chan{flex-wrap:wrap;gap:4px}
+ /* cam kết: 1 hàng trượt ngang gọn */
+ .cam-ket{display:flex;overflow-x:auto;scrollbar-width:none;gap:8px;margin:14px -16px 0;padding:0 16px 4px}
+ .cam-ket::-webkit-scrollbar{display:none}
+ .ck{flex:0 0 auto;padding:7px 14px 7px 7px;border-radius:999px;gap:8px}
+ .ck i{width:32px;height:32px;border-radius:50%}
+ .ck i svg{width:16px;height:16px}
+ .ck b{font-size:13px;white-space:nowrap}
+ .ck span{display:none}
+ /* mục, thẻ sản phẩm */
+ .muc{padding:28px 0 4px}
+ .td{margin-bottom:16px}.td h2{font-size:23px}.td .tren{font-size:11px}
+ .td-hang{margin-bottom:12px}.td-hang h2{font-size:21px}.td-hang h2 small{font-size:12px}
+ .luoi{gap:10px}
+ .the{border-radius:14px}
+ .nhan-ds{flex-direction:row;flex-wrap:wrap;gap:4px;left:6px;top:6px;max-width:78%}
+ .nhan-ds .nhan:nth-child(n+3){display:none}
+ .nhan{font-size:10px;padding:2px 6px;border-radius:5px}
+ .nhan.giam{font-size:11px}
+ .hang-so{min-width:30px;height:30px;font-size:12px;line-height:30px;right:6px;top:6px;padding:0 4px}
+ .the .tt{padding:10px 10px 12px;gap:2px}
+ .the .tt .ten{font-size:13.5px;min-height:36px}
+ .the .tt .phu{font-size:11.5px}
+ .the .gia{gap:2px 6px;padding-top:6px}
+ .the .gia b{font-size:15px}
+ .the .gia s{font-size:11px}
+ .the .km-chu{font-size:10.5px;padding:1px 6px}
+ .len-dau{display:none}
+ .bang-toi{padding:30px 0 26px;margin-top:26px}
+ .mui-hang{display:none}
+ .loc{padding:10px;gap:8px;border-radius:14px}
+ .o-tim{flex:1 1 100%}
+ .loc select{flex:1 1 calc(50% - 4px);height:40px}
+ .phieu-luoi{grid-template-columns:1fr;gap:10px}
+ .phieu .gt{width:92px}.phieu .gt b{font-size:23px}.phieu .nd{padding:12px 12px 12px 18px}
+ .hai-cot .hop-trang{padding:14px;border-radius:16px}
+ .ch{border-radius:16px}.ch .trai,.ch .phai{padding:22px 18px}.ch .trai h3{font-size:22px}
+ .chan{padding-top:30px;margin-top:30px}
+ .thanh-duoi a{font-size:10.5px}
+ .ct-tt{padding:18px 16px 18px;gap:10px}.ct-tt h2{font-size:22px}
+ .ct-gia b{font-size:25px}
+ .cs{grid-template-columns:1fr}
+}
+/* quản lý trên điện thoại */
+@media(max-width:900px){
+ .ql-logo-dt{display:block}.ql-logo-dt .logo-dau{width:30px;height:30px}
+ .ql-tren{gap:10px}
+ .ql-than{padding-bottom:160px}
+ .thanh-ngay{flex-direction:column;align-items:stretch;gap:8px}
+ .tn-1>.nho{display:none}
+ .tn-1 .chip{flex:1;height:40px}
+ .tn-2{flex-wrap:nowrap}
+ .tn-2 .o-ngay{flex:1;width:auto;height:40px}
+ .tn-2 .nho-nut{width:40px;height:40px;border:1.5px solid var(--vien);border-radius:10px;background:#fff;flex:none}
+ #g-xem{display:none}
+ .doi-nhanh{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -14px 12px;padding:0 14px 2px}
+ .doi-nhanh::-webkit-scrollbar{display:none}
+ .doi-nhanh .chip{flex:none}
+ .doi-nhanh>.nho{white-space:nowrap}
+ .gia-sua,.gia-sua tbody{display:block}
+ .gia-sua tr{background:#fbf8f3;border:1px solid var(--vien)!important;border-radius:14px;padding:12px!important;margin-bottom:10px}
+ #g-luu{position:fixed;left:12px;right:12px;bottom:calc(66px + env(safe-area-inset-bottom));z-index:45;height:50px;font-size:15px;box-shadow:0 12px 26px -10px rgba(138,13,20,.8)}
+ .ds-sp .dong{flex-wrap:wrap;padding:12px 4px;gap:10px}
+ .ds-sp .dong>div:nth-of-type(2){flex:1;min-width:0}
+ .ds-sp .dong .g{margin-left:68px;width:calc(100% - 68px);display:flex;align-items:center;gap:8px;text-align:left}
+ .ds-sp .dong .g s{display:inline}
+ .ds-sp .dong .g .nut{margin:0 0 0 auto}
+ .phan-doan{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;max-width:100%}
+ .phan-doan::-webkit-scrollbar{display:none}
+ .phan-doan button{white-space:nowrap;flex:none}
+ .kpi>div{padding:14px}.kpi span{font-size:12px}
+ .viec button{padding:10px}
+}
 @media print{.hd,.mn,.tb,.thanh-duoi,.chan,.cc,.len-dau{display:none}}
 </style>
 </head>
@@ -897,7 +1016,7 @@ function veBangGia() {
     '<select class="chon-ngay" id="chon-ngay" aria-label="Chọn ngày xem giá">' + ngayCoGia().map(function (d) { return '<option value="' + d + '"' + (d === ngay ? " selected" : "") + '>' + tenNgay(d) + ", " + hienNgay(d) + '</option>'; }).join("") + '</select></div></div>' +
     (nay ? "" : '<div class="cu-ngay">Đang xem giá ngày ' + hienNgay(ngay) + ' · <a href="#" id="ve-nay" style="font-weight:700;text-decoration:underline">Về hôm nay</a></div>') +
     '<table><thead><tr><th>Loại vàng</th><th>Mua vào</th><th>Bán ra</th></tr></thead><tbody>' +
-    (ds.length ? ds.map(function (g) { var t = truoc[g.ma]; return '<tr><td>' + e(g.ten) + '</td><td><b>' + so(g.mua) + '</b>' + doiHtml(t ? g.mua - t.mua : null) + '</td><td class="ban"><b>' + so(g.ban) + '</b>' + doiHtml(t ? g.ban - t.ban : null) + '</td></tr>'; }).join("") : '<tr><td colspan="3" class="nho" style="text-align:center;padding:24px">Chưa có giá ngày này</td></tr>') +
+    (ds.length ? ds.map(function (g) { var t = truoc[g.ma]; return '<tr><td>' + e(g.ten) + '</td><td data-n="Mua vào"><b>' + so(g.mua) + '</b>' + doiHtml(t ? g.mua - t.mua : null) + '</td><td class="ban" data-n="Bán ra"><b>' + so(g.ban) + '</b>' + doiHtml(t ? g.ban - t.ban : null) + '</td></tr>'; }).join("") : '<tr><td colspan="3" class="nho" style="text-align:center;padding:24px">Chưa có giá ngày này</td></tr>') +
     '</tbody></table><div class="bgc-chan"><span>Đơn vị: đồng/chỉ · ▲▼ so với ngày trước</span><a href="#" data-cuon="bieu-svg">Biểu đồ →</a></div>';
   $("#chon-ngay").onchange = function () { BG.ngay = this.value === homNay() ? "" : this.value; veBangGia(); };
   var v = $("#ve-nay"); if (v) v.onclick = function (ev) { ev.preventDefault(); ev.stopPropagation(); BG.ngay = ""; veBangGia(); };
@@ -1114,7 +1233,7 @@ function veQLThan() {
   var nutTab = function (t) { return '<button data-tab="' + t[0] + '" class="' + (QL.tab === t[0] ? "chon" : "") + '">' + IC[t[2]] + '<span>' + t[1] + '</span>' + (t[0] === "giu" && n ? '<span class="dem">' + n + '</span>' : "") + '</button>'; };
   $("#app").innerHTML = '<div class="ql"><aside class="ql-ben"><a class="logo" href="#quanly">' + LOGO + '<span><b>' + e(d.cd.ten) + '</b><small>Quản lý cửa hàng</small></span></a><nav>' + TAB_QL.map(function (t) { return ({ tq: '<div class="nhom-nav">Hằng ngày</div>', sp: '<div class="nhom-nav">Cửa hàng</div>', cd: '<div class="nhom-nav">Hệ thống</div>' }[t[0]] || "") + nutTab(t); }).join("") + '</nav>' +
     '<div class="cuoi"><a href="#" target="_blank">' + IC.mat + 'Xem trang khách</a><a href="#tv" target="_blank">' + IC.tv + 'Màn hình TV</a><button id="ql-ra">' + IC.ra + 'Đăng xuất</button></div></aside>' +
-    '<div class="ql-chinh"><div class="ql-tren"><h1>' + tab[1] + '</h1><span class="ngay">' + thu(homNay()) + ", " + hienNgay(homNay()) + '</span><button class="nut nut-vien chi-dt" id="ql-ra2" style="height:36px;padding:0 12px;font-size:13px">Thoát</button></div><div class="ql-than" id="ql-than"></div></div></div>' +
+    '<div class="ql-chinh"><div class="ql-tren"><span class="ql-logo-dt">' + LOGO + '</span><h1>' + tab[1] + '</h1><span class="ngay">' + thu(homNay()) + ", " + hienNgay(homNay()) + '</span><button class="nut nut-vien chi-dt" id="ql-ra2" style="height:36px;padding:0 12px;font-size:13px">Thoát</button></div><div class="ql-than" id="ql-than"></div></div></div>' +
     '<nav class="ql-tab-dt">' + [["tq", "Tổng quan", "tq"], ["ban", "Bán hàng", "quet"], ["gia", "Giá vàng", "bieu"], ["sp", "Mẫu", "sp"]].map(nutTab).join("") +
       '<button id="ql-them-dt" class="' + (["km", "gd", "giu", "cd"].indexOf(QL.tab) >= 0 ? "chon" : "") + '">' + IC.menu + '<span>Thêm</span>' + (n ? '<span class="dem">' + n + '</span>' : "") + '</button></nav>';
   $$("[data-tab]").forEach(function (b) { b.onclick = function () { QL.tab = b.dataset.tab; veQLThan(); scrollTo(0, 0); }; });
@@ -1327,10 +1446,10 @@ function qlGia() {
   var ve = function () {
     $("#ql-than").innerHTML = '<div class="ql-the"><h3>' + IC.lich + ' Niêm yết giá theo ngày<span class="phai"><button class="nut nut-do" id="g-luu">' + (nay ? "Lưu & niêm yết" : "Lưu giá ngày " + hienNgay(ngay)) + '</button></span></h3>' +
       '<p class="mo-ta-the">Chọn ngày cần nhập/sửa. <b>Hôm nay</b> = giá đang hiện cho khách. <b>Ngày đã qua</b> = sửa giá chốt ngày đó (dùng cho "xem giá theo ngày" và biểu đồ).</p>' +
-      '<div class="thanh-ngay"><span class="nho" style="font-weight:600">Ngày:</span><button class="chip' + (nay ? " chon" : "") + '" data-ng="' + hom + '">Hôm nay</button><button class="chip' + (ngay === congNgay(hom, -1) ? " chon" : "") + '" data-ng="' + congNgay(hom, -1) + '">Hôm qua</button>' +
-      '<button class="nho-nut" data-lui="-1" title="Ngày trước">' + IC.trai + '</button><input class="o-ngay" id="g-ngay" value="' + hienNgay(ngay) + '"><button class="nho-nut" data-lui="1" title="Ngày sau"' + (nay ? ' disabled style="opacity:.3"' : "") + '>' + IC.phai + '</button><button class="nut nut-vien" id="g-xem" style="height:38px;padding:0 14px">Mở ngày này</button></div>' +
+      '<div class="thanh-ngay"><div class="tn-1"><span class="nho" style="font-weight:600">Ngày:</span><button class="chip' + (nay ? " chon" : "") + '" data-ng="' + hom + '">Hôm nay</button><button class="chip' + (ngay === congNgay(hom, -1) ? " chon" : "") + '" data-ng="' + congNgay(hom, -1) + '">Hôm qua</button></div>' +
+      '<div class="tn-2"><button class="nho-nut" data-lui="-1" title="Ngày trước">' + IC.trai + '</button><input class="o-ngay" id="g-ngay" value="' + hienNgay(ngay) + '"><button class="nho-nut" data-lui="1" title="Ngày sau"' + (nay ? ' disabled style="opacity:.3"' : "") + '>' + IC.phai + '</button><button class="nut nut-vien" id="g-xem" style="height:38px;padding:0 14px">Mở ngày này</button></div></div>' +
       '<div class="bao-ngay ' + (nay ? "nay" : "qua") + '">' + (nay ? "● Đang sửa giá <b>hôm nay " + hienNgay(hom) + "</b> – lưu xong khách thấy giá mới ngay." : "● Đang sửa giá <b>" + thu(ngay) + ", " + hienNgay(ngay) + "</b> (ngày đã qua) – chỉ ghi vào lịch sử, KHÔNG đổi giá đang niêm yết.") + '</div>' +
-      '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px"><span class="nho">Đổi nhanh các loại vàng (trừ bạc):</span>' +
+      '<div class="doi-nhanh"><span class="nho">Đổi nhanh tất cả (trừ bạc):</span>' +
       [-200000, -100000, -50000, 50000, 100000, 200000].map(function (x) { return '<button class="chip" data-cong="' + x + '">' + (x > 0 ? "+" : "−") + so(Math.abs(x) / 1000) + 'k</button>'; }).join("") + '</div>' +
       '<table class="gia-sua"><thead><tr><th>Loại vàng</th><th style="text-align:right">Mua vào (đ/chỉ)</th><th style="text-align:right">Bán ra (đ/chỉ)</th><th>Hiện</th><th></th></tr></thead><tbody>' +
       ds.map(function (g, i) { return '<tr data-i="' + i + '"><td class="c-ten" data-n="Loại vàng"><input type="text" data-k="ten" value="' + e(g.ten) + '"' + (nay ? "" : " disabled") + '></td>' +
@@ -1343,6 +1462,7 @@ function qlGia() {
     $("#ls-ky").value = QL.lsKy; veLS();
     $("#ls-ky").onchange = function () { QL.lsKy = this.value; veLS(); };
     $("#g-ngay").onkeydown = function (ev) { if (ev.key === "Enter") moNgay(isoTu(this.value)); };
+    $("#g-ngay").addEventListener("input", function () { var d = isoTu(this.value); if (d && d !== ngay && this.value.length === 10) moNgay(d); });
   };
   var doc = function () { $$("#ql-than tr[data-i]").forEach(function (tr) { var g = ds[+tr.dataset.i]; g.ten = $('[data-k=ten]', tr).value; g.mua = docSo($('[data-k=mua]', tr).value); g.ban = docSo($('[data-k=ban]', tr).value); g.hien = $('[data-k=hien]', tr).checked; }); };
   var moNgay = function (dd) { if (!dd) { bao("Ngày chưa đúng (dd/mm/yyyy)"); return; } if (dd > hom) { bao("Không đặt giá cho ngày chưa tới"); return; } QL.ngayGia = dd === hom ? "" : dd; qlGia(); };
