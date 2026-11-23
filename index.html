@@ -1147,8 +1147,6 @@ function moSP(ma) {
       (t.giam > 0 && !het ? '<span class="tk">Tiết kiệm ' + so(t.giam) + 'đ · ' + e(t.km.ten) + (t.km.den ? " (đến " + hienNgay(t.km.den) + ")" : "") + '</span>' : "") + '</div>' +
     '<table class="bang-tt"><tr><td>Loại vàng</td><td>' + e(lv ? lv.ten : p.loai || "—") + '</td></tr>' +
     (p.tl ? '<tr><td>Trọng lượng</td><td>' + so2(p.tl) + ' chỉ (' + so2(Math.round(p.tl * 375) / 100) + ' g)</td></tr>' : "") +
-    (t.vang ? '<tr><td>Giá vàng (' + so(lv.ban) + 'đ/chỉ)</td><td>' + so(t.vang) + 'đ</td></tr>' : "") +
-    (p.cong && !(p.gia > 0) ? '<tr><td>Tiền công</td><td>' + (congSau != null ? '<s style="color:#a3968b;font-weight:400">' + so(p.cong) + 'đ</s> ' + so(congSau) + 'đ' : so(p.cong) + 'đ') + '</td></tr>' : "") +
     (p.co ? '<tr><td>Kích cỡ</td><td>' + e(p.co) + '</td></tr>' : "") + '</table>' +
     (p.mt ? '<p class="mo-ta">' + e(p.mt) + '</p>' : "") +
     '<div class="cs">' + ["Cam kết đúng tuổi vàng", "Bảo hành trọn đời", "Thu đổi theo giá niêm yết", "Giữ mẫu miễn phí " + (D.cd.giu_ngay || 3) + " ngày"].map(function (x) { return '<span>' + IC.ok + e(x) + '</span>'; }).join("") + '</div>' +
@@ -1440,7 +1438,7 @@ function moInTem(dsMa) {
   var d = QL.d, gm = qlGM(), chon = {}, kho = ls_("tv_kho_tem") || "nhan";
   var ds = d.sp.filter(function (p) { return p.tt !== "daban"; });
   (dsMa && dsMa.length ? dsMa : ds.map(function (p) { return p.ma; })).forEach(function (m) { chon[m] = 1; });
-  var m = moHop('<div style="padding:22px 20px 20px"><h2 style="font:800 23px var(--serif);margin:0 0 6px;padding-right:40px">In tem mã vạch</h2><p class="nho" style="margin:0 0 12px">Mỗi món 1 tem. Tem gồm mã vạch, mã, tên, loại vàng, trọng lượng, tiền công. Máy quét đọc mã vạch này ở trang Bán hàng.</p>' +
+  var m = moHop('<div style="padding:22px 20px 20px"><h2 style="font:800 23px var(--serif);margin:0 0 6px;padding-right:40px">In tem mã vạch</h2><p class="nho" style="margin:0 0 12px">Mỗi món 1 tem. Tem gồm mã vạch, mã, tên, loại vàng, trọng lượng (không in tiền công – khách không thấy). Máy quét đọc mã vạch này ở trang Bán hàng.</p>' +
     '<div class="truong" style="margin-bottom:10px"><label>Khổ tem</label><select id="t-kho">' + Object.keys(KHO_TEM).map(function (k) { return '<option value="' + k + '"' + (k === kho ? " selected" : "") + '>' + KHO_TEM[k][0] + '</option>'; }).join("") + '</select></div>' +
     '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><button class="chip" id="t-het">Chọn hết</button><button class="chip" id="t-bo">Bỏ chọn</button><span class="nho" id="t-dem" style="margin-left:auto"></span></div>' +
     '<div class="ds-tem">' + d.sp.map(function (p) { return '<label><input type="checkbox" value="' + e(p.ma) + '"' + (chon[p.ma] ? " checked" : "") + '><b style="min-width:70px">' + e(p.ma) + '</b><span style="flex:1;min-width:0">' + e(p.ten) + ' <span class="nho">· ' + e((gm[p.loai] || {}).ten || "") + (p.tl ? " · " + so2(p.tl) + " chỉ" : "") + '</span></span>' + (p.tt === "daban" ? '<span class="tag daban">Đã bán</span>' : "") + '</label>'; }).join("") + '</div>' +
@@ -1462,7 +1460,7 @@ function inTem(mas, kho) {
       var p = d.sp.filter(function (x) { return x.ma === ma; })[0]; if (!p) return "";
       var s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       JsBarcode(s, p.ma, { format: "CODE128", width: kho === "nhan" ? 1.2 : 1.6, height: kho === "nhan" ? 26 : kho === "cuon" ? 40 : 46, displayValue: false, margin: 0 });
-      var lv = (gm[p.loai] || {}).ten || p.loai || "", tt = '<div class="tt"><b>' + e(p.ma) + '</b><span>' + e(p.ten) + '</span><span>' + e(lv.replace(/\s*\(.*\)/, "")) + (p.tl ? " · " + so2(p.tl) + " chỉ" : "") + '</span>' + (p.cong ? '<span>Công: ' + so(p.cong) + 'đ</span>' : "") + '</div>';
+      var lv = (gm[p.loai] || {}).ten || p.loai || "", tt = '<div class="tt"><b>' + e(p.ma) + '</b><span>' + e(p.ten) + '</span><span>' + e(lv.replace(/\s*\(.*\)/, "")) + (p.tl ? " · " + so2(p.tl) + " chỉ" : "") + '</span>' + '</div>';
       return '<div class="tem">' + (kho === "nhan" ? '<div class="nua">' + s.outerHTML + '<i>' + e(p.ma) + '</i></div><div class="duoi"></div><div class="nua">' + tt + '</div>' : '<div class="tiem">' + e(d.cd.ten) + '</div>' + s.outerHTML + tt) + '</div>';
     }).join("");
     var css = '@page{margin:' + (kho === "a4" ? "8mm" : "0") + ';size:' + (kho === "a4" ? "A4" : K[1] + "mm " + K[2] + "mm") + '}*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#000}' +

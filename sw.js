@@ -1,5 +1,5 @@
-// Tiệm Vàng v4.2.1 – trang lấy mạng trước, mất mạng thì dùng bản đã lưu
-var C = "tiemvang-4.2.1";
+// Tiệm Vàng v4.2.2 – trang lấy mạng trước, mất mạng thì dùng bản đã lưu
+var C = "tiemvang-4.2.2";
 self.addEventListener("install", function (e) { self.skipWaiting(); e.waitUntil(caches.open(C).then(function (c) { return c.addAll(["./", "manifest.json", "icon-192.png"]); })); });
 self.addEventListener("activate", function (e) { e.waitUntil(caches.keys().then(function (k) { return Promise.all(k.filter(function (x) { return x !== C; }).map(function (x) { return caches.delete(x); })); }).then(function () { return self.clients.claim(); })); });
 self.addEventListener("fetch", function (e) {
