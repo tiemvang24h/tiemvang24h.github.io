@@ -295,7 +295,7 @@ body.tv{background:#0e0605;overflow:hidden}
 .tv-dau .logo-dau{width:4.4vw;height:4.4vw;min-width:44px;min-height:44px}
 .tv-dau h1{margin:0;font:800 clamp(24px,2.9vw,58px)/1.05 var(--serif)}
 .tv-dau .kh{color:#d9bf8a;font-size:clamp(12px,1.1vw,22px);letter-spacing:.15em;text-transform:uppercase}
-.tv-gio{margin-left:auto;text-align:right}
+.tv-gio{margin-left:1.6vw;padding-left:1.6vw;border-left:1px solid rgba(226,192,110,.3);text-align:right}
 .tv-gio b{font:700 clamp(26px,3.2vw,64px)/1 var(--sans);font-variant-numeric:tabular-nums;color:#fff}
 .tv-gio div{color:#d9bf8a;font-size:clamp(12px,1.1vw,22px);margin-top:.3vw}
 .tv-giua{display:grid;grid-template-columns:1.35fr 1fr;gap:1.8vw;padding:0 2.4vw 1.2vw;min-height:0}
@@ -335,8 +335,8 @@ body.tv{background:#0e0605;overflow:hidden}
 .tv-trinh .slide .chu s{font-size:clamp(12px,1.1vw,22px);color:#cdb9a0;margin-left:.6vw}
 .tv-trinh .slide .chu em{display:inline-block;font-style:normal;background:#d32f2f;color:#fff;font:700 clamp(11px,1vw,20px) var(--sans);padding:.2vw .6vw;border-radius:.4vw;margin-left:.6vw;vertical-align:.2vw}
 .tv-trinh .slide .chu small{display:block;color:#d8c7a3;font-size:clamp(11px,1vw,20px);margin-top:.3vw}
-.tv-qr{position:absolute;right:1vw;top:1vw;background:#fff;border-radius:.8vw;padding:.6vw;text-align:center;color:#2a1f17;font-size:clamp(9px,.75vw,15px);font-weight:700;z-index:2;width:clamp(90px,9vw,180px)}
-.tv-qr canvas,.tv-qr img{width:100%!important;height:auto!important}
+.tv-qr-o{margin-left:auto;display:flex;align-items:center;gap:.8vw}.tv-qr-o span{text-align:right;color:#d9bf8a;font-size:clamp(10px,.8vw,16px);line-height:1.25;letter-spacing:.06em;text-transform:uppercase}.tv-qr-o span b{display:block;color:#ffe7a4;font-size:1.15em;letter-spacing:.02em;text-transform:none}.tv-qr{background:#fff;border-radius:.6vw;padding:.35vw;width:clamp(56px,4.6vw,96px);height:clamp(56px,4.6vw,96px);box-shadow:0 0 0 2px rgba(226,192,110,.55),0 8px 20px -8px rgba(0,0,0,.6);flex:none}
+.tv-qr canvas,.tv-qr img{width:100%!important;height:100%!important;display:block}
 .tv-chan .chu-chay{font-size:clamp(14px,1.45vw,30px);background:var(--vang-g);color:#3a2504;border:0}
 .tv-chan .chu-chay span{padding:.7vw 0 .7vw 100%;animation-duration:40s}
 .tv-nut{position:fixed;right:16px;bottom:70px;z-index:5;opacity:0;transition:opacity .3s}
@@ -1195,8 +1195,8 @@ function veTV() {
   document.body.className = "tv"; document.title = D.cd.ten + " – Bảng giá";
   var gm = giaMap(), sp = D.sp.filter(function (p) { return p.tt !== "daban"; });
   var uu = sp.filter(function (p) { return p.nb || coNhan(p, "hot") || coNhan(p, "banchay") || tinhGia(p, gm).giam > 0; }); if (uu.length >= 3) sp = uu;
-  $("#app").innerHTML = '<div id="tv"><div class="tv-dau">' + LOGO + '<div><h1 class="vang-chu">' + e(D.cd.ten) + '</h1><div class="kh">' + e(D.cd.khau) + '</div></div><div class="tv-gio"><b id="tv-gio"></b><div id="tv-ngay"></div></div></div>' +
-    '<div class="tv-giua"><div class="tv-bang" id="tv-bang"></div><div class="tv-phai"><div class="tv-trinh" id="tv-trinh"><div class="tv-qr"><div id="tv-qr"></div>Quét xem mẫu</div>' +
+  $("#app").innerHTML = '<div id="tv"><div class="tv-dau">' + LOGO + '<div><h1 class="vang-chu">' + e(D.cd.ten) + '</h1><div class="kh">' + e(D.cd.khau) + '</div></div><div class="tv-qr-o"><span>Quét mã<b>Xem mẫu &amp; giá</b></span><div class="tv-qr" id="tv-qr"></div></div><div class="tv-gio"><b id="tv-gio"></b><div id="tv-ngay"></div></div></div>' +
+    '<div class="tv-giua"><div class="tv-bang" id="tv-bang"></div><div class="tv-phai"><div class="tv-trinh" id="tv-trinh">' +
     sp.map(function (p, i) { var t = tinhGia(p, gm); return '<div class="slide' + (i ? "" : " hien") + '"><div class="hinh">' + anhHtml(p.anh[0], "", false) + '</div><div class="chu"><b>' + e(p.ten) + '</b><span>' + tien(t.ban) + '</span>' + (t.giam > 0 ? '<s>' + so(t.goc) + 'đ</s><em>' + e(nhanKM(t.km)) + '</em>' : "") + '<small>' + e((gm[p.loai] || {}).ten || "") + (p.tl ? " · " + so2(p.tl) + " chỉ" : "") + ' · Mã ' + e(p.ma) + '</small></div></div>'; }).join("") +
     '</div><div class="tv-bieu" id="tv-bieu"></div></div></div><div class="tv-chan">' + (htmlChay(D.cd, false) || htmlChay(Object.assign({}, D.cd, { chu_chay: "Kính chào quý khách · " + D.cd.dc + " · ĐT " + D.cd.sdt }), false)) + '</div>' +
     '<button class="nut nut-vang tv-nut" id="tv-full">⛶ Toàn màn hình</button></div>';
@@ -1207,7 +1207,7 @@ function veTV() {
   dongHo(); TV.hen.push(setInterval(dongHo, 1000));
   TV.hen.push(setInterval(function () { var s = $$("#tv-trinh .slide"); if (s.length < 2) return; s[TV.slide % s.length].classList.remove("hien"); TV.slide++; var n = s[TV.slide % s.length]; n.classList.add("hien"); var h = n.querySelector(".hinh>*"); if (h) { h.style.animation = "none"; void h.offsetWidth; h.style.animation = ""; } }, 7000));
   TV.hen.push(setInterval(function () { taiXem().then(function (d) { d.ls = sapLS(d.ls); var cu = JSON.stringify([D.gia, D.sp, D.cd, D.km]); D = d; if (JSON.stringify([D.gia, D.sp, D.cd, D.km]) !== cu) veTV(); }).catch(function () {}); }, 60000));
-  napQR().then(function () { new QRCode($("#tv-qr"), { text: urlWeb(), width: 256, height: 256, correctLevel: QRCode.CorrectLevel.M }); }).catch(function () { var q = $(".tv-qr"); if (q) q.remove(); });
+  napQR().then(function () { new QRCode($("#tv-qr"), { text: urlWeb(), width: 256, height: 256, correctLevel: QRCode.CorrectLevel.M }); }).catch(function () { var q = $(".tv-qr-o"); if (q) q.remove(); });
   $("#tv-full").onclick = function () { var d = document.documentElement; (d.requestFullscreen || d.webkitRequestFullscreen || function () {}).call(d); };
   try { if (navigator.wakeLock) navigator.wakeLock.request("screen").catch(function () {}); } catch (x) {}
 }
