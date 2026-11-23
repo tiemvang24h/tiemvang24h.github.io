@@ -238,7 +238,7 @@ svg.ic{width:18px;height:18px;flex:none}
 .chan .logo b{color:#f3d48b}
 .chan .cuoi{margin-top:30px;border-top:1px solid rgba(255,255,255,.08);padding:16px 0 96px;font-size:12.5px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
 @media(min-width:761px){.chan .cuoi{padding-bottom:18px}}
-.chan .ql{color:#6f5f4f;display:inline}
+.chan .vao-ql{color:#6f5f4f;display:inline;margin:0}
 .thanh-duoi{position:fixed;left:0;right:0;bottom:0;z-index:45;display:none;grid-template-columns:repeat(5,1fr);background:#fff;border-top:1px solid var(--vien);padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -6px 20px rgba(0,0,0,.06)}
 .thanh-duoi a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 7px;font-size:11px;font-weight:600;color:var(--mo)}
 .thanh-duoi a svg{width:22px;height:22px}
@@ -308,6 +308,21 @@ body.tv{background:#0e0605;overflow:hidden}
 .tv-bang .hang .s i{display:block;font:600 clamp(10px,.85vw,17px) var(--sans);font-style:normal;margin-top:.35vw}
 .tv-bang .hang:nth-child(even):not(.tieu){background:rgba(255,255,255,.025)}
 .tv-chu{padding:.7vw 1.6vw;color:#a8946e;font-size:clamp(11px,.9vw,18px);border-top:1px solid rgba(226,192,110,.16)}
+.tv-phai{display:grid;grid-template-rows:minmax(0,1.25fr) minmax(0,1fr);gap:1.2vw;min-height:0}
+.tv-bieu{border:1px solid rgba(226,192,110,.35);border-radius:1.4vw;background:linear-gradient(160deg,rgba(138,13,20,.35),rgba(0,0,0,.3));padding:1vw 1.2vw .7vw;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.tv-bieu.moi{animation:hien .8s}
+.tvb-dau{display:flex;justify-content:space-between;align-items:flex-start;gap:1vw}
+.tvb-dau b{display:block;font:700 clamp(14px,1.35vw,28px)/1.15 var(--sans);color:#fbf1d9}
+.tvb-dau span{font-size:clamp(10px,.85vw,17px);color:#a8946e;letter-spacing:.08em;text-transform:uppercase}
+.tvb-doi{text-align:right;font:800 clamp(14px,1.35vw,28px)/1.1 var(--sans);color:#d9c6a6}
+.tvb-doi.len{color:#4ade80}.tvb-doi.xuong{color:#ff7b7b}
+.tvb-doi small{display:block;font-size:.62em;font-weight:600;opacity:.9}
+.tv-bieu svg{flex:1;min-height:0;width:100%;margin-top:.3vw}
+.tvb-chu{display:flex;gap:1.4vw;align-items:center;font-size:clamp(10px,.85vw,17px);color:#cdb9a0}
+.tvb-chu i{display:inline-block;width:1.2em;height:.25em;border-radius:2px;vertical-align:.25em;margin-right:.4em}
+.tvb-cham{margin-left:auto;display:flex;gap:.4vw}
+.tvb-cham i{width:.5vw!important;height:.5vw!important;min-width:6px;min-height:6px;border-radius:50%!important;background:rgba(255,255,255,.25);margin:0!important}
+.tvb-cham i.on{background:#ffd877}
 .tv-trinh{position:relative;border-radius:1.4vw;overflow:hidden;border:1px solid rgba(226,192,110,.35);background:#1b0d0a;min-height:0}
 .tv-trinh .slide{position:absolute;inset:0;opacity:0;transition:opacity 1.2s;display:flex;flex-direction:column}
 .tv-trinh .slide.hien{opacity:1}
@@ -326,7 +341,7 @@ body.tv{background:#0e0605;overflow:hidden}
 .tv-chan .chu-chay span{padding:.7vw 0 .7vw 100%;animation-duration:40s}
 .tv-nut{position:fixed;right:16px;bottom:70px;z-index:5;opacity:0;transition:opacity .3s}
 #tv:hover .tv-nut{opacity:1}
-@media(max-aspect-ratio:1/1){.tv-giua{grid-template-columns:1fr;grid-template-rows:1.2fr 1fr}}
+@media(max-aspect-ratio:1/1){.tv-giua{grid-template-columns:1fr;grid-template-rows:1.1fr 1.4fr}}
 
 /* ===== quản lý ===== */
 body.ql-mo{background:#f3efe9}
@@ -721,6 +736,20 @@ body.ql-mo{background:#f3efe9}
  .kpi>div{padding:14px}.kpi span{font-size:12px}
  .viec button{padding:10px}
 }
+@media(max-width:760px){
+ .chan{padding:24px 0 0;margin-top:24px}
+ .chan .luoi-chan{grid-template-columns:1fr 1fr;gap:16px 14px}
+ .chan .luoi-chan>div:nth-child(1),.chan .luoi-chan>div:nth-child(2){grid-column:1/-1}
+ .chan .luoi-chan>div:nth-child(1) p{font-size:12.5px!important;margin-top:8px!important;line-height:1.55!important}
+ .chan .luoi-chan>div:nth-child(2){display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
+ .chan .luoi-chan>div:nth-child(2) h4{width:100%;margin:0}
+ .chan .luoi-chan>div:nth-child(2) a{margin:0}
+ .chan h4{font-size:12px;margin:0 0 6px;letter-spacing:1px}
+ .chan a{margin:4px 0;font-size:13px}
+ .chan .cuoi{margin-top:16px;padding:12px 0 86px;font-size:11.5px;gap:6px}
+ #cua-hang{padding-top:22px}
+ .ch .phai ul{gap:6px;font-size:13.5px}
+}
 @media print{.hd,.mn,.tb,.thanh-duoi,.chan,.cc,.len-dau{display:none}}
 </style>
 </head>
@@ -946,7 +975,7 @@ function veKhach() {
       '<div><h4>Liên hệ</h4><a href="' + linkGoi() + '">☎ ' + e(c.sdt) + '</a>' + (linkZalo() ? '<a href="' + linkZalo() + '" target="_blank" rel="noopener">Zalo ' + e(c.zalo || c.sdt) + '</a>' : "") + '<a href="#" data-cuon="cua-hang">' + e(c.dc) + '</a></div>' +
       '<div><h4>Sản phẩm</h4>' + nhoms.slice(0, 6).map(function (n) { return '<a href="#" data-nhom="' + e(n) + '">' + e(n) + '</a>'; }).join("") + '</div>' +
       '<div><h4>Tiện ích</h4><a href="#" data-cuon="bang-gia">Bảng giá vàng hôm nay</a><a href="#" data-cuon="bieu-svg">Biểu đồ giá vàng</a><a href="#" data-cuon="t-kq">Tính tiền vàng</a><a href="#tv" target="_blank">Màn hình bảng giá</a></div></div>' +
-      '<div class="cuoi"><span>© ' + new Date().getFullYear() + ' ' + e(c.ten) + '. Giá sản phẩm là giá tạm tính theo giá vàng hiện tại.</span><a class="ql" href="#quanly">Chủ tiệm đăng nhập</a></div></div></footer>' +
+      '<div class="cuoi"><span>© ' + new Date().getFullYear() + ' ' + e(c.ten) + '. Giá sản phẩm là giá tạm tính theo giá vàng hiện tại.</span><a class="vao-ql" href="#quanly">Chủ tiệm đăng nhập</a></div></div></footer>' +
     '<nav class="thanh-duoi"><a href="#" data-cuon="dau">' + IC.nha + '<span>Trang chủ</span></a><a href="#" data-cuon="bang-gia">' + IC.bieu + '<span>Giá vàng</span></a><a href="' + linkGoi() + '" class="goi"><i>' + IC.goi + '</i><span>Gọi</span></a><a href="#" data-km="1">' + IC.qua + '<span>Ưu đãi</span></a>' +
       (linkZalo() ? '<a class="zalo" href="' + linkZalo() + '" target="_blank" rel="noopener">' + IC.zalo + '<span>Zalo</span></a>' : '<a href="#" data-cuon="cua-hang">' + IC.dc + '<span>Cửa hàng</span></a>') + '</nav>';
   veBanner(); veBangGia(); veMucPhu(); veChips(); veLuoi(); veBieu(); tinhTien(); hieuUng();
@@ -975,7 +1004,7 @@ var IO = null;
 function hieuUng() {
   if (!$(".len-dau")) { var b = document.createElement("button"); b.className = "len-dau"; b.setAttribute("aria-label", "Lên đầu trang"); b.innerHTML = IC.len; b.onclick = function () { scrollTo({ top: 0, behavior: "smooth" }); }; document.body.appendChild(b);
     addEventListener("scroll", function () { var y = scrollY, l = $(".len-dau"), h = $(".hd"); if (l) l.classList.toggle("hien", y > 900 && !document.body.className); if (h) h.classList.toggle("bong", y > 10); }, { passive: true }); }
-  if (!("IntersectionObserver" in window)) return;
+  if (!("IntersectionObserver" in window) || innerWidth <= 760) return;
   if (!IO) IO = new IntersectionObserver(function (ds) { ds.forEach(function (x) { if (x.isIntersecting) { x.target.classList.add("da"); IO.unobserve(x.target); } }); }, { rootMargin: "0px 0px -8% 0px" });
   $$("#app .muc .td, #app .muc .td-hang, #app .cam-ket, #app .dm, #app .phieu-luoi, #app .hai-cot, #app .ch, #app .bang-toi .khung").forEach(function (el) { if (el.getBoundingClientRect().top > innerHeight) { el.classList.add("hien-dan"); IO.observe(el); } });
 }
@@ -1167,11 +1196,12 @@ function veTV() {
   var gm = giaMap(), sp = D.sp.filter(function (p) { return p.tt !== "daban"; });
   var uu = sp.filter(function (p) { return p.nb || coNhan(p, "hot") || coNhan(p, "banchay") || tinhGia(p, gm).giam > 0; }); if (uu.length >= 3) sp = uu;
   $("#app").innerHTML = '<div id="tv"><div class="tv-dau">' + LOGO + '<div><h1 class="vang-chu">' + e(D.cd.ten) + '</h1><div class="kh">' + e(D.cd.khau) + '</div></div><div class="tv-gio"><b id="tv-gio"></b><div id="tv-ngay"></div></div></div>' +
-    '<div class="tv-giua"><div class="tv-bang" id="tv-bang"></div><div class="tv-trinh" id="tv-trinh"><div class="tv-qr"><div id="tv-qr"></div>Quét xem mẫu</div>' +
+    '<div class="tv-giua"><div class="tv-bang" id="tv-bang"></div><div class="tv-phai"><div class="tv-trinh" id="tv-trinh"><div class="tv-qr"><div id="tv-qr"></div>Quét xem mẫu</div>' +
     sp.map(function (p, i) { var t = tinhGia(p, gm); return '<div class="slide' + (i ? "" : " hien") + '"><div class="hinh">' + anhHtml(p.anh[0], "", false) + '</div><div class="chu"><b>' + e(p.ten) + '</b><span>' + tien(t.ban) + '</span>' + (t.giam > 0 ? '<s>' + so(t.goc) + 'đ</s><em>' + e(nhanKM(t.km)) + '</em>' : "") + '<small>' + e((gm[p.loai] || {}).ten || "") + (p.tl ? " · " + so2(p.tl) + " chỉ" : "") + ' · Mã ' + e(p.ma) + '</small></div></div>'; }).join("") +
-    '</div></div><div class="tv-chan">' + (htmlChay(D.cd, false) || htmlChay(Object.assign({}, D.cd, { chu_chay: "Kính chào quý khách · " + D.cd.dc + " · ĐT " + D.cd.sdt }), false)) + '</div>' +
+    '</div><div class="tv-bieu" id="tv-bieu"></div></div></div><div class="tv-chan">' + (htmlChay(D.cd, false) || htmlChay(Object.assign({}, D.cd, { chu_chay: "Kính chào quý khách · " + D.cd.dc + " · ĐT " + D.cd.sdt }), false)) + '</div>' +
     '<button class="nut nut-vang tv-nut" id="tv-full">⛶ Toàn màn hình</button></div>';
-  veTVBang();
+  veTVBang(); TV.bi = TV.bi || 0; veTVBieu();
+  TV.hen.push(setInterval(function () { TV.bi++; veTVBieu(); }, 12000));
   var dongHo = function () { var d = new Date(); $("#tv-gio").textContent = d.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Ho_Chi_Minh" });
     $("#tv-ngay").textContent = d.toLocaleDateString("vi-VN", { weekday: "long", day: "2-digit", month: "2-digit", year: "numeric", timeZone: "Asia/Ho_Chi_Minh" }).replace(/^./, function (c) { return c.toUpperCase(); }); };
   dongHo(); TV.hen.push(setInterval(dongHo, 1000));
@@ -1180,6 +1210,31 @@ function veTV() {
   napQR().then(function () { new QRCode($("#tv-qr"), { text: urlWeb(), width: 256, height: 256, correctLevel: QRCode.CorrectLevel.M }); }).catch(function () { var q = $(".tv-qr"); if (q) q.remove(); });
   $("#tv-full").onclick = function () { var d = document.documentElement; (d.requestFullscreen || d.webkitRequestFullscreen || function () {}).call(d); };
   try { if (navigator.wakeLock) navigator.wakeLock.request("screen").catch(function () {}); } catch (x) {}
+}
+// biểu đồ 30 ngày trên TV, lần lượt từng loại vàng
+function veTVBieu() {
+  var o = $("#tv-bieu"); if (!o || !D.gia.length) return;
+  var g = D.gia[TV.bi % D.gia.length], h = homNay(), ds = [];
+  for (var i = 29; i >= 0; i--) { var d = congNgay(h, -i), x = giaMap(giaNgay(d))[g.ma]; if (x) ds.push({ d: d, m: x.mua, b: x.ban }); }
+  if (!ds.length) { o.innerHTML = ""; return; }
+  if (ds.length === 1) ds.unshift({ d: congNgay(ds[0].d, -1), m: ds[0].m, b: ds[0].b });
+  var W = 800, H = 300, L = 92, R = 18, T = 18, B = 34, lo = Infinity, hi = -Infinity;
+  ds.forEach(function (x) { lo = Math.min(lo, x.m, x.b); hi = Math.max(hi, x.m, x.b); });
+  if (hi === lo) { hi += 100000; lo -= 100000; } var pad = (hi - lo) * .15; hi += pad; lo -= pad;
+  var X = function (i) { return L + i / (ds.length - 1) * (W - L - R); }, Y = function (v) { return T + (hi - v) / (hi - lo) * (H - T - B); };
+  var duong = function (k) { return ds.map(function (x, i) { return (i ? "L" : "M") + X(i).toFixed(1) + " " + Y(x[k]).toFixed(1); }).join(" "); };
+  var luoi = "";
+  for (var j = 0; j <= 3; j++) { var v = lo + (hi - lo) * j / 3, y = Y(v); luoi += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y.toFixed(1) + '" y2="' + y.toFixed(1) + '" stroke="rgba(226,192,110,.14)"/><text x="' + (L - 12) + '" y="' + (y + 6).toFixed(1) + '" text-anchor="end" font-size="17" fill="#a8946e">' + gon(v) + '</text>'; }
+  var buoc = Math.max(1, Math.ceil(ds.length / 6)), mx = "";
+  ds.forEach(function (x, i) { if (i % buoc === 0 || i === ds.length - 1) mx += '<text x="' + X(i).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="16" fill="#a8946e">' + hienNgay(x.d, false) + '</text>'; });
+  var dau = ds[0], cuoi = ds[ds.length - 1], ch = cuoi.b - dau.b, pt = dau.b ? ch / dau.b * 100 : 0;
+  o.innerHTML = '<div class="tvb-dau"><div><b>' + e(g.ten) + '</b><span>Biểu đồ giá ' + (ds.length >= 30 ? "30 ngày" : ds.length + " ngày") + '</span></div><div class="tvb-doi ' + (ch > 0 ? "len" : ch < 0 ? "xuong" : "") + '">' + (ch > 0 ? "▲ " : ch < 0 ? "▼ " : "") + so(Math.abs(ch)) + 'đ<small>' + (ch ? (pt > 0 ? "+" : "−") + Math.abs(pt).toFixed(1).replace(".", ",") + "%" : "giữ giá") + '</small></div></div>' +
+    '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet"><defs><linearGradient id="tvg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2c06e" stop-opacity=".45"/><stop offset="1" stop-color="#e2c06e" stop-opacity="0"/></linearGradient></defs>' + luoi + mx +
+    '<path d="' + duong("b") + ' L' + X(ds.length - 1).toFixed(1) + ' ' + (H - B) + ' L' + X(0) + ' ' + (H - B) + 'Z" fill="url(#tvg)"/>' +
+    '<path d="' + duong("m") + '" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.5" stroke-dasharray="7 6"/><path d="' + duong("b") + '" fill="none" stroke="#ffd877" stroke-width="4" stroke-linejoin="round"/>' +
+    '<circle cx="' + X(ds.length - 1).toFixed(1) + '" cy="' + Y(cuoi.b).toFixed(1) + '" r="8" fill="#ffd877" stroke="#160807" stroke-width="3"/></svg>' +
+    '<div class="tvb-chu"><span><i style="background:#ffd877"></i>Bán ra</span><span><i style="background:#fff;opacity:.6"></i>Mua vào</span><span class="tvb-cham">' + D.gia.map(function (x, k) { return '<i class="' + (k === TV.bi % D.gia.length ? "on" : "") + '"></i>'; }).join("") + '</span></div>';
+  o.classList.remove("moi"); void o.offsetWidth; o.classList.add("moi");
 }
 function veTVBang() {
   var truoc = doiSoVoi(homNay());
